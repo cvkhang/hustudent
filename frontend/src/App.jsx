@@ -7,6 +7,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 const FlashcardDashboard = lazy(() => import('@/pages/flashcards/FlashcardDashboard'));
 const SetDetailPage = lazy(() => import('@/pages/flashcards/SetDetailPage'));
+const FlashcardStudy = lazy(() => import('@/pages/flashcards/FlashcardStudy'));
 
 function AppRoutes() {
   return (
@@ -25,6 +26,13 @@ function AppRoutes() {
           <MainLayout>
             <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full" /></div>}>
               <SetDetailPage />
+            </Suspense>
+          </MainLayout>
+        } />
+        <Route path="/flashcards/:id/study" element={
+          <MainLayout>
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full" /></div>}>
+              <FlashcardStudy />
             </Suspense>
           </MainLayout>
         } />
