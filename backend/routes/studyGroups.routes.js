@@ -1,9 +1,10 @@
 import express from 'express';
-import { getStudyGroups } from '../controllers/studyGroups.controller.js';
+import { getStudyGroups, createGroup } from '../controllers/studyGroups.controller.js';
 
 const router = express.Router();
 
-// Study groups routes stub
+// Study groups routes
 router.get('/', getStudyGroups);
+router.post('/create', createGroup);
 
 export default router;
