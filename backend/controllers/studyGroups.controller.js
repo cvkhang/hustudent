@@ -43,3 +43,63 @@ export const createGroup = (req, res) => {
     });
   }
 };
+
+export const joinGroup = (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const userId = req.user?.id || 2; // Mock user ID
+
+    const group = Group.findById(parseInt(groupId));
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        error: 'Group not found'
+      });
+    }
+
+    const added = GroupMember.create(group.id, userId, 'member');
+    if (!added) {
+      return res.status(400).json({
+        success: false,
+        error: 'Already a member'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Joined group successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+export const leaveGroup = (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const userId = req.user?.id || 2; // Mock user ID
+
+    const group = Group.findById(parseInt(groupId));
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        error: 'Group not found'
+      });
+    }
+
+    GroupMember.remove(parseInt(groupId), userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Left group successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
