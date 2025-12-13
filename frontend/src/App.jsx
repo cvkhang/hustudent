@@ -12,6 +12,7 @@ const FlashcardMatch = lazy(() => import('@/pages/flashcards/FlashcardMatch'));
 const QuizDashboard = lazy(() => import('@/pages/quizzes/QuizDashboard'));
 const TakeQuiz = lazy(() => import('@/pages/quizzes/TakeQuiz'));
 const QuizEditor = lazy(() => import('@/pages/quizzes/QuizEditor'));
+const PostsPage = lazy(() => import('@/pages/PostsPage'));
 
 function AppRoutes() {
   return (
@@ -65,6 +66,13 @@ function AppRoutes() {
           <MainLayout>
             <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full" /></div>}>
               <QuizEditor />
+            </Suspense>
+          </MainLayout>
+        } />
+        <Route path="/posts" element={
+          <MainLayout>
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full" /></div>}>
+              <PostsPage />
             </Suspense>
           </MainLayout>
         } />
