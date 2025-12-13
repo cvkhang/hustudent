@@ -103,3 +103,44 @@ export const leaveGroup = (req, res) => {
     });
   }
 };
+
+export const getMyGroups = (req, res) => {
+  try {
+    const userId = req.user?.id || 1; // Mock user ID
+    const myMemberships = GroupMember.findByUser(userId);
+    const groups = myMemberships.map(m => Group.findById(m.groupId)).filter(g => g);
+
+    res.status(200).json({
+      success: true,
+      data: groups
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+export const getGroupDetail = (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const group = Group.findById(parseInt(groupId));
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        error: 'Group not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: group
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
