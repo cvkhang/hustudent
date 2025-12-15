@@ -4,6 +4,7 @@ import chatRoutes from './chatRoutes.js';
 import quizRoutes from './quizRoutes.js';
 import matchingRoutes from './matchingRoutes.js';
 import flashcardRoutes from './flashcardRoutes.js';
+import uploadRoutes from './uploadRoutes.js';
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ router.use('/chats', chatRoutes);
 router.use('/', quizRoutes);
 router.use('/', matchingRoutes);
 router.use('/', flashcardRoutes);
+router.use('/', uploadRoutes);
 
 // Default API info
 router.get('/', (req, res) => {
