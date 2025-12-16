@@ -5,6 +5,7 @@ import quizRoutes from './quizRoutes.js';
 import matchingRoutes from './matchingRoutes.js';
 import flashcardRoutes from './flashcardRoutes.js';
 import uploadRoutes from './uploadRoutes.js';
+import postRoutes from './postRoutes.js';
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.get('/health', (req, res) => {
 // API routes
 router.use('/groups', groupRoutes);
 router.use('/chats', chatRoutes);
+router.use('/posts', postRoutes);
 router.use('/', quizRoutes);
 router.use('/', matchingRoutes);
 router.use('/', flashcardRoutes);
