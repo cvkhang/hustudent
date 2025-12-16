@@ -1,6 +1,7 @@
-const socketIO = require('socket.io');
-const { verifyToken } = require('../utils/jwt');
-const env = require('../config/env');
+
+import { Server } from 'socket.io';
+import { verifyToken } from '../utils/jwt.js';
+import { env } from '../config/env.js';
 
 let io;
 
@@ -21,8 +22,8 @@ function parseCookies(cookieHeader) {
   return list;
 }
 
-const init = (server) => {
-  io = socketIO(server, {
+export const init = (server) => {
+  io = new Server(server, {
     cors: {
       origin: [env.FRONTEND_URL, 'http://localhost:5173'],
       credentials: true,
@@ -39,6 +40,12 @@ const init = (server) => {
       if (process.env.SKIP_AUTH === 'true') {
         socket.userId = '11111111-1111-1111-1111-111111111111';
         return next();
+      }
+
+      if (!socket.handshake.headers.cookie) {
+        // No cookies, maybe allow if using header-based auth?
+        // For now failing
+        return next(new Error('Authentication error: No cookie'));
       }
 
       const cookies = parseCookies(socket.handshake.headers.cookie);
@@ -104,11 +111,11 @@ const init = (server) => {
   return io;
 };
 
-const getIO = () => {
+export const getIO = () => {
   if (!io) {
     throw new Error('Socket.io not initialized!');
   }
   return io;
 };
 
-module.exports = { init, getIO };
+export default { init, getIO };

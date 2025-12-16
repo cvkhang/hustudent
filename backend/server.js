@@ -21,11 +21,15 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Study Groups routes
-import studyGroupsRoutes from './routes/studyGroups.routes.js';
-app.use('/api/study-groups', studyGroupsRoutes);
+import groupsRoutes from './routes/groupRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
+import { init as initSocket } from './socket/socketManager.js';
+
+app.use('/api/groups', groupsRoutes);
+app.use('/api/chats', chatRoutes);
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  initSocket(server);
 });

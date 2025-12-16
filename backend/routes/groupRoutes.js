@@ -1,5 +1,5 @@
 import express from 'express';
-import { getStudyGroups, createGroup, joinGroup, leaveGroup, getMyGroups, getGroupDetail, createSession, getSessionsByGroup, rsvpToSession } from '../controllers/studyGroups.controller.js';
+import { getStudyGroups, createGroup, joinGroup, leaveGroup, getMyGroups, getGroupDetail, createSession, getSessionsByGroup, rsvpToSession } from '../controllers/groupController.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();

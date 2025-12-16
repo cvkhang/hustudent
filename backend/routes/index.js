@@ -3,7 +3,7 @@ import express from 'express';
 // import authRoutes from './auth.routes.js';
 // import userRoutes from './user.routes.js';
 // import postRoutes from './post.routes.js';
-
+import groupRoutes from './groupRoutes.js';
 const router = express.Router();
 
 // Health check
@@ -16,7 +16,7 @@ router.get('/health', (req, res) => {
 });
 
 // API routes
-// router.use('/auth', authRoutes);
+router.use('/groups', groupRoutes);
 // router.use('/users', userRoutes);
 // router.use('/posts', postRoutes);
 
