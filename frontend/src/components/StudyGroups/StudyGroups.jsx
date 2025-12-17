@@ -26,24 +26,16 @@ const StudyGroups = () => {
     }
   };
 
-  const handleCreateGroup = async (e) => {
-    e.preventDefault();
+  const handleJoinGroup = async (groupId) => {
     try {
-      setCreating(true);
-      const response = await fetch('http://localhost:5000/api/study-groups/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+      const response = await fetch(`http://localhost:5000/api/study-groups/${groupId}/join`, {
+        method: 'POST'
       });
-      if (!response.ok) throw new Error('Failed to create group');
-      const data = await response.json();
-      setGroups([...groups, data.data]);
-      setFormData({ name: '', description: '' });
-      setShowCreateForm(false);
+      if (!response.ok) throw new Error('Failed to join group');
+      alert('Joined group successfully!');
+      fetchGroups(); // Refresh list
     } catch (err) {
-      setError(err.message);
-    } finally {
-      setCreating(false);
+      alert('Error joining group: ' + err.message);
     }
   };
 
@@ -84,6 +76,7 @@ const StudyGroups = () => {
               <h3>{group.name}</h3>
               <p>{group.description}</p>
               <p>Members: {group.members.length}</p>
+              <button onClick={() => handleJoinGroup(group.id)}>Join Group</button>
             </li>
           ))}
         </ul>
