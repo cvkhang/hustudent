@@ -1,6 +1,7 @@
 // Study Groups Controller
 import { Group } from '../models/Group.js';
 import { GroupMember } from '../models/GroupMember.js';
+import { StudySession } from '../models/StudySession.js';
 
 export const getStudyGroups = (req, res) => {
   try {
@@ -136,6 +137,68 @@ export const getGroupDetail = (req, res) => {
     res.status(200).json({
       success: true,
       data: group
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+export const createSession = (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const { title, description, dateTime } = req.body;
+    const creatorId = req.user?.id || 1;
+
+    const group = Group.findById(parseInt(groupId));
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        error: 'Group not found'
+      });
+    }
+
+    const session = StudySession.create(parseInt(groupId), title, description, dateTime, creatorId);
+
+    res.status(201).json({
+      success: true,
+      data: session
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+export const getSessionsByGroup = (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const { type } = req.query; // 'upcoming' or 'past'
+
+    const group = Group.findById(parseInt(groupId));
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        error: 'Group not found'
+      });
+    }
+
+    let sessions;
+    if (type === 'upcoming') {
+      sessions = StudySession.findUpcomingByGroup(parseInt(groupId));
+    } else if (type === 'past') {
+      sessions = StudySession.findPastByGroup(parseInt(groupId));
+    } else {
+      sessions = StudySession.findByGroup(parseInt(groupId));
+    }
+
+    res.status(200).json({
+      success: true,
+      data: sessions
     });
   } catch (error) {
     res.status(500).json({
