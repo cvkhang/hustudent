@@ -57,6 +57,9 @@ The backend will run on `http://localhost:5000`
 ### Backend
 Create a `.env` file in the `backend` directory:
 ```
+PORT=5000
+NODE_ENV=development
+```
 
 ## Module 5.4: Study Groups & Scheduling
 
@@ -104,9 +107,6 @@ Create a `.env` file in the `backend` directory:
 - Authentication is mocked (user ID = 1)
 - Admin role is assigned to group creators
 - Sessions show attendee counts based on RSVP status
-PORT=5000
-NODE_ENV=development
-```
 
 ## Available Scripts
 
