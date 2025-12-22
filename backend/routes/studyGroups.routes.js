@@ -1,5 +1,5 @@
 import express from 'express';
-import { getStudyGroups, createGroup, joinGroup, leaveGroup, getMyGroups, getGroupDetail, createSession, getSessionsByGroup } from '../controllers/studyGroups.controller.js';
+import { getStudyGroups, createGroup, joinGroup, leaveGroup, getMyGroups, getGroupDetail, createSession, getSessionsByGroup, rsvpToSession } from '../controllers/studyGroups.controller.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -13,5 +13,6 @@ router.get('/my', requireAuth, getMyGroups);
 router.get('/:groupId', getGroupDetail);
 router.post('/:groupId/sessions', requireAuth, createSession);
 router.get('/:groupId/sessions', getSessionsByGroup);
+router.post('/sessions/:sessionId/rsvp', requireAuth, rsvpToSession);
 
 export default router;

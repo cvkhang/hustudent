@@ -2,6 +2,7 @@
 import { Group } from '../models/Group.js';
 import { GroupMember } from '../models/GroupMember.js';
 import { StudySession } from '../models/StudySession.js';
+import { RSVP } from '../models/RSVP.js';
 
 export const getStudyGroups = (req, res) => {
   try {
@@ -196,9 +197,50 @@ export const getSessionsByGroup = (req, res) => {
       sessions = StudySession.findByGroup(parseInt(groupId));
     }
 
+    // Add attendee count to each session
+    const sessionsWithCount = sessions.map(session => ({
+      ...session,
+      attendeeCount: RSVP.getAttendeeCount(session.id)
+    }));
+
     res.status(200).json({
       success: true,
-      data: sessions
+      data: sessionsWithCount
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+export const rsvpToSession = (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { status } = req.body; // 'yes', 'no', 'cancel'
+    const userId = req.user?.id || 1;
+
+    const session = StudySession.findById(parseInt(sessionId));
+    if (!session) {
+      return res.status(404).json({
+        success: false,
+        error: 'Session not found'
+      });
+    }
+
+    if (!['yes', 'no', 'cancel'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid status'
+      });
+    }
+
+    const rsvp = RSVP.create(parseInt(sessionId), userId, status);
+
+    res.status(200).json({
+      success: true,
+      data: rsvp
     });
   } catch (error) {
     res.status(500).json({
