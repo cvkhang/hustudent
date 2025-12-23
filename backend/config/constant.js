@@ -1,0 +1,62 @@
+export const MAJORS = [
+  "Khoa học máy tính",
+  "Kỹ thuật máy tính",
+  "Công nghệ thông tin Global ICT",
+  "Công nghệ thông tin Việt Nhật",
+  "Kỹ thuật phần mềm",
+  "Hệ thống thông tin",
+  "An toàn thông tin",
+  "Khoa học dữ liệu và trí tuệ nhân tạo",
+  "Toán - Tin",
+  "Hệ thống nhúng thông minh và IoT",
+  "Công nghệ đa phương tiện",
+  "Điện tử viễn thông",
+  "Kỹ thuật điều khiển & Tự động hóa",
+  "Kỹ thuật y sinh",
+  "Kỹ thuật điện",
+  "Kỹ thuật cơ điện tử",
+  "Kỹ thuật cơ khí",
+  "Kỹ thuật ô tô",
+  "Kỹ thuật hàng không",
+  "Kinh tế công nghiệp",
+  "Quản trị kinh doanh",
+  "Kế toán",
+  "Tài chính - Ngân hàng",
+  "Ngôn ngữ Anh",
+  "Khác"
+];
+
+export const ACADEMIC_YEARS = [
+  "K69",
+  "K68",
+  "K67",
+  "K66",
+  "K65",
+  "K64",
+  "K63",
+  "K62",
+  "K61",
+  "Khác"
+];
+
+export const INTERESTS = [
+  "Lập trình",
+  "Design UI/UX",
+  "AI/Machine Learning",
+  "Game Dev",
+  "Blockchain",
+  "An toàn thông tin",
+  "IoT",
+  "Đọc sách",
+  "Cầu lông",
+  "Đá bóng",
+  "Bóng rổ",
+  "Bơi lội",
+  "Chạy bộ",
+  "Esports",
+  "Boardgame",
+  "Âm nhạc",
+  "Du lịch",
+  "Nhiếp ảnh",
+  "Nấu ăn"
+];
