@@ -1,25 +1,6 @@
-import { Sequelize } from 'sequelize';
-import { env } from '../config/env.js';
+import sequelize from '../config/database.js';
 
-// Initialize Sequelize with Supabase PostgreSQL
-const sequelize = new Sequelize(env.DATABASE_URL, {
-  dialect: 'postgres',
-  logging: env.NODE_ENV === 'development' ? console.log : false,
-  pool: {
-    max: 10,
-    min: 0,
-    acquire: 60000,
-    idle: 10000
-  },
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false // Supabase requires SSL
-    }
-  }
-});
-
-// Import models (will be created)
+// Import models
 // Authentication & Users
 import User from './User.js';
 import AuthRefreshToken from './AuthRefreshToken.js';
