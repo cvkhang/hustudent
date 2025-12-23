@@ -2,6 +2,7 @@ import express from 'express';
 import groupRoutes from './groupRoutes.js';
 import chatRoutes from './chatRoutes.js';
 import quizRoutes from './quizRoutes.js';
+import matchingRoutes from './matchingRoutes.js';
 const router = express.Router();
 
 // Health check
@@ -17,6 +18,7 @@ router.get('/health', (req, res) => {
 router.use('/groups', groupRoutes);
 router.use('/chats', chatRoutes);
 router.use('/quiz', quizRoutes);
+router.use('/matching', matchingRoutes);
 
 
 // Default API info
