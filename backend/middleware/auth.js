@@ -1,19 +1,87 @@
-// Auth middleware
-export const requireAuth = (req, res, next) => {
-  // Mock auth
-  req.user = { id: 1 }; // Mock user
-  next();
+import { verifyToken } from '../utils/jwt.js';
+import { AppError, ErrorCodes } from '../utils/errors.js';
+import { User } from '../models/index.js';
+
+/**
+ * Authentication middleware
+ * Verifies JWT token and attaches user to request
+ */
+export const authenticate = async (req, res, next) => {
+  try {
+    // Get token from cookie (not header!)
+    const token = req.cookies?.token;
+
+    if (!token) {
+      throw new AppError(ErrorCodes.AUTH_REQUIRED);
+    }
+
+    // Verify token
+    let decoded;
+    try {
+      decoded = verifyToken(token);
+    } catch (err) {
+      throw new AppError(ErrorCodes.AUTH_INVALID_TOKEN);
+    }
+
+    // Check token type
+    if (decoded.type !== 'access') {
+      throw new AppError(ErrorCodes.AUTH_INVALID_TOKEN, 'Invalid token type');
+    }
+
+    // Get user from database
+    const user = await User.findByPk(decoded.userId, {
+      attributes: { exclude: ['password_hash'] }
+    });
+
+    if (!user || user.deleted_at) {
+      throw new AppError(ErrorCodes.AUTH_INVALID_TOKEN, 'User not found');
+    }
+
+    // Attach user to request
+    req.user = user;
+    req.userId = user.id;
+
+    next();
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const requireAdmin = (req, res, next) => {
-  const { groupId } = req.params;
-  const userId = req.user?.id || 1;
-  const { GroupMember } = await import('../models/GroupMember.js');
-  if (!GroupMember.isAdmin(parseInt(groupId), userId)) {
-    return res.status(403).json({
-      success: false,
-      error: 'Admin access required'
-    });
+/**
+ * Optional authentication - doesn't fail if no token
+ */
+export const optionalAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return next();
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    try {
+      const decoded = verifyToken(token);
+      if (decoded.type === 'access') {
+        const user = await User.findByPk(decoded.userId, {
+          attributes: { exclude: ['password_hash'] }
+        });
+        if (user && !user.deleted_at) {
+          req.user = user;
+          req.userId = user.id;
+        }
+      }
+    } catch (err) {
+      // Ignore token errors for optional auth
+    }
+
+    next();
+  } catch (error) {
+    next(error);
   }
-  next();
+};
+
+export default {
+  authenticate,
+  optionalAuth
 };

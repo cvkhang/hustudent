@@ -1,9 +1,6 @@
 import express from 'express';
-// Import route modules when created
-// import authRoutes from './auth.routes.js';
-// import userRoutes from './user.routes.js';
-// import postRoutes from './post.routes.js';
 import groupRoutes from './groupRoutes.js';
+import chatRoutes from './chatRoutes.js';
 const router = express.Router();
 
 // Health check
@@ -17,8 +14,8 @@ router.get('/health', (req, res) => {
 
 // API routes
 router.use('/groups', groupRoutes);
-// router.use('/users', userRoutes);
-// router.use('/posts', postRoutes);
+router.use('/chats', chatRoutes);
+
 
 // Default API info
 router.get('/', (req, res) => {
