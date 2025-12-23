@@ -21,6 +21,10 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Study Groups routes
+import studyGroupsRoutes from './routes/studyGroups.routes.js';
+app.use('/api/study-groups', studyGroupsRoutes);
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
