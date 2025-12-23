@@ -1,5 +1,5 @@
-
 import ChatService from '../services/chatService.js';
+import { AppError, ErrorCodes } from '../utils/errors.js';
 
 export const getChats = async (req, res, next) => {
   try {
