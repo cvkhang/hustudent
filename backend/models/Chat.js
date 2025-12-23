@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const Chat = sequelize.define('Chat', {
   id: {
@@ -71,4 +71,5 @@ Chat.getOrderedUsers = (userId1, userId2) => {
     : { userA: userId2, userB: userId1 };
 };
 
-module.exports = Chat;
+export default Chat;
+

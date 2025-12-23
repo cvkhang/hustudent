@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 /**
  * Friendship model
@@ -67,4 +67,5 @@ Friendship.getOrderedIds = (userId1, userId2) => {
     : { userLow: userId2, userHigh: userId1 };
 };
 
-module.exports = Friendship;
+export default Friendship;
+

@@ -1,6 +1,6 @@
 import { verifyToken } from '../utils/jwt.js';
 import { AppError, ErrorCodes } from '../utils/errors.js';
-import { User } from '../models/index.js';
+import User from '../models/User.js';
 
 /**
  * Authentication middleware

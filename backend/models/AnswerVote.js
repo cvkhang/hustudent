@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const AnswerVote = sequelize.define('AnswerVote', {
   answer_id: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true, references: { model: 'answers', key: 'id' }, onDelete: 'CASCADE' },
@@ -12,4 +12,5 @@ const AnswerVote = sequelize.define('AnswerVote', {
   updatedAt: 'updated_at'
 });
 
-module.exports = AnswerVote;
+export default AnswerVote;
+

@@ -1,18 +1,18 @@
 import express from 'express';
 import { getStudyGroups, createGroup, joinGroup, leaveGroup, getMyGroups, getGroupDetail, createSession, getSessionsByGroup, rsvpToSession } from '../controllers/groupController.js';
-import { requireAuth } from '../middleware/auth.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // Study groups routes
 router.get('/', getStudyGroups);
-router.post('/create', requireAuth, createGroup);
-router.post('/:groupId/join', requireAuth, joinGroup);
-router.post('/:groupId/leave', requireAuth, leaveGroup);
-router.get('/my', requireAuth, getMyGroups);
+router.post('/create', authenticate, createGroup);
+router.post('/:groupId/join', authenticate, joinGroup);
+router.post('/:groupId/leave', authenticate, leaveGroup);
+router.get('/my', authenticate, getMyGroups);
 router.get('/:groupId', getGroupDetail);
-router.post('/:groupId/sessions', requireAuth, createSession);
+router.post('/:groupId/sessions', authenticate, createSession);
 router.get('/:groupId/sessions', getSessionsByGroup);
-router.post('/sessions/:sessionId/rsvp', requireAuth, rsvpToSession);
+router.post('/sessions/:sessionId/rsvp', authenticate, rsvpToSession);
 
 export default router;

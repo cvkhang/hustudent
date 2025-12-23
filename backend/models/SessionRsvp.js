@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const SessionRsvp = sequelize.define('SessionRsvp', {
   session_id: {
@@ -33,4 +33,4 @@ const SessionRsvp = sequelize.define('SessionRsvp', {
   updatedAt: 'updated_at'
 });
 
-module.exports = SessionRsvp;
+export default SessionRsvp;

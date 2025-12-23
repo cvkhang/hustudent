@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const AuthRefreshToken = sequelize.define('AuthRefreshToken', {
   id: {
@@ -36,4 +36,5 @@ const AuthRefreshToken = sequelize.define('AuthRefreshToken', {
   updatedAt: false
 });
 
-module.exports = AuthRefreshToken;
+export default AuthRefreshToken;
+

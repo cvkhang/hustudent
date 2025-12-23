@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const QuizQuestion = sequelize.define('QuizQuestion', {
   id: {
@@ -48,4 +48,5 @@ const QuizQuestion = sequelize.define('QuizQuestion', {
   updatedAt: 'updated_at'
 });
 
-module.exports = QuizQuestion;
+export default QuizQuestion;
+

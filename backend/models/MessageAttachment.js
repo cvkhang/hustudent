@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const MessageAttachment = sequelize.define('MessageAttachment', {
   id: {
@@ -44,4 +44,5 @@ const MessageAttachment = sequelize.define('MessageAttachment', {
   updatedAt: false
 });
 
-module.exports = MessageAttachment;
+export default MessageAttachment;
+

@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const StudyBuddy = sequelize.define('StudyBuddy', {
   id: {
@@ -49,4 +49,5 @@ StudyBuddy.getOrderedIds = (userId1, userId2) => {
     : { userA: userId2, userB: userId1 };
 };
 
-module.exports = StudyBuddy;
+export default StudyBuddy;
+

@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const FlashcardProgress = sequelize.define('FlashcardProgress', {
   user_id: {
@@ -37,4 +37,5 @@ const FlashcardProgress = sequelize.define('FlashcardProgress', {
   updatedAt: 'updated_at'
 });
 
-module.exports = FlashcardProgress;
+export default FlashcardProgress;
+

@@ -1,3 +1,4 @@
+import { Sequelize } from 'sequelize';
 import sequelize from '../config/database.js';
 
 // Import models
@@ -152,49 +153,38 @@ Notification.belongsTo(User, { foreignKey: 'sender_id', as: 'sender' });
 // EXPORTS
 // ============================================
 
-const db = {
+// Default export for backward compatibility
+export default {
   sequelize,
   Sequelize,
-  // Auth & Users
   User,
   AuthRefreshToken,
-  // Friends
   FriendRequest,
   Friendship,
-  // Chat
   Chat,
   Message,
   MessageAttachment,
-  // Groups & Sessions
   Group,
   GroupMember,
   StudySession,
   SessionRsvp,
-  // Posts
   Post,
   PostLike,
   PostBookmark,
   PostComment,
-  // Q&A
   Question,
   Answer,
   AnswerVote,
-  // Social Matching
   Subject,
   UserStudyProfile,
   UserSubject,
   StudyInvitation,
   StudyBuddy,
-  // Learning Tools
   FlashcardSet,
   Flashcard,
   FlashcardProgress,
   Quiz,
   QuizQuestion,
   QuizAttempt,
-  // Notifications
   Notification
 };
-
-export { sequelize };
-export default db;

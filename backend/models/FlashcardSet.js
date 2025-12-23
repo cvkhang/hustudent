@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const FlashcardSet = sequelize.define('FlashcardSet', {
   id: {
@@ -42,4 +42,5 @@ const FlashcardSet = sequelize.define('FlashcardSet', {
   deletedAt: 'deleted_at'
 });
 
-module.exports = FlashcardSet;
+export default FlashcardSet;
+

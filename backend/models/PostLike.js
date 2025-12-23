@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const PostLike = sequelize.define('PostLike', {
   post_id: {
@@ -23,4 +23,5 @@ const PostLike = sequelize.define('PostLike', {
   updatedAt: false
 });
 
-module.exports = PostLike;
+export default PostLike;
+

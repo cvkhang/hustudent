@@ -1,13 +1,13 @@
 
 import express from 'express';
 import chatController from '../controllers/chatController.js';
-import { requireAuth } from '../middleware/auth.js';
+import { authenticate } from '../middleware/auth.js';
 import { uploadChatAttachments } from '../middleware/upload.js';
 
 const router = express.Router();
 
 // All chat routes require authentication
-router.use(requireAuth);
+router.use(authenticate);
 
 // Chats
 router.get('/', chatController.getChats);

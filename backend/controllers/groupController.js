@@ -1,8 +1,8 @@
 // Study Groups Controller
-import { Group } from '../models/Group.js';
-import { GroupMember } from '../models/GroupMember.js';
-import { StudySession } from '../models/StudySession.js';
-import { RSVP } from '../models/RSVP.js';
+import Group from '../models/Group.js';
+import GroupMember from '../models/GroupMember.js';
+import StudySession from '../models/StudySession.js';
+import SessionRsvp from '../models/SessionRsvp.js';
 
 export const getStudyGroups = (req, res) => {
   try {
