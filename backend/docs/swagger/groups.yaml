@@ -1,0 +1,192 @@
+paths:
+  /api/groups:
+    get:
+      tags:
+        - Groups
+      summary: Get all study groups
+      description: Returns list of all study groups
+      responses:
+        '200':
+          description: List of groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Group'
+
+    post:
+      tags:
+        - Groups
+      summary: Create a new study group
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Group created
+        '401':
+          description: Unauthorized
+
+  /api/groups/my:
+    get:
+      tags:
+        - Groups
+      summary: Get my groups
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: List of user's groups
+
+  /api/groups/{groupId}:
+    get:
+      tags:
+        - Groups
+      summary: Get group details
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Group details
+        '404':
+          description: Group not found
+
+  /api/groups/{groupId}/join:
+    post:
+      tags:
+        - Groups
+      summary: Join a group
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Joined successfully
+
+  /api/groups/{groupId}/leave:
+    post:
+      tags:
+        - Groups
+      summary: Leave a group
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Left successfully
+
+  /api/groups/{groupId}/sessions:
+    get:
+      tags:
+        - Groups
+      summary: Get study sessions for a group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [upcoming, past]
+      responses:
+        '200':
+          description: List of sessions
+
+    post:
+      tags:
+        - Groups
+      summary: Create a study session
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+                - dateTime
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                dateTime:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Session created
+
+  /api/groups/sessions/{sessionId}/rsvp:
+    post:
+      tags:
+        - Groups
+      summary: RSVP to a session
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [yes, no, cancel]
+      responses:
+        '200':
+          description: RSVP updated

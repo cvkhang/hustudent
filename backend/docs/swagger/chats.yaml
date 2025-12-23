@@ -1,0 +1,134 @@
+paths:
+  /api/chats:
+    get:
+      tags:
+        - Chats
+      summary: Get my chats
+      description: Returns list of user's direct chats
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: List of chats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Chat'
+
+    post:
+      tags:
+        - Chats
+      summary: Create or get a chat
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - otherUserId
+              properties:
+                otherUserId:
+                  type: string
+      responses:
+        '200':
+          description: Chat created or retrieved
+
+  /api/chats/{chatId}/messages:
+    get:
+      tags:
+        - Chats
+      summary: Get messages in a chat
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: before
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Load messages before this timestamp
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: List of messages
+
+    post:
+      tags:
+        - Chats
+      summary: Send a message
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '200':
+          description: Message sent
+
+  /api/chats/{chatId}/read:
+    post:
+      tags:
+        - Chats
+      summary: Mark chat as read
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Marked as read
+
+  /api/chats/group/{groupId}:
+    get:
+      tags:
+        - Chats
+      summary: Get group chat
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Group chat details

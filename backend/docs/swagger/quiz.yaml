@@ -1,0 +1,307 @@
+paths:
+  /api/quiz/quizzes:
+    get:
+      tags:
+        - Quiz
+      summary: Get my quizzes
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: List of user's quizzes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Quiz'
+
+  /api/quiz/public:
+    get:
+      tags:
+        - Quiz
+      summary: Get public quizzes
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: tags
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of public quizzes
+
+  /api/quiz/categories:
+    get:
+      tags:
+        - Quiz
+      summary: Get quiz categories
+      responses:
+        '200':
+          description: List of categories with counts
+
+  /api/quiz:
+    post:
+      tags:
+        - Quiz
+      summary: Create a new quiz
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+                visibility:
+                  type: string
+                  enum: [public, private]
+                time_limit:
+                  type: integer
+      responses:
+        '201':
+          description: Quiz created
+
+  /api/quiz/{quizId}:
+    get:
+      tags:
+        - Quiz
+      summary: Get quiz details
+      parameters:
+        - name: quizId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Quiz details
+
+    put:
+      tags:
+        - Quiz
+      summary: Update quiz
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: quizId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Quiz updated
+
+    delete:
+      tags:
+        - Quiz
+      summary: Delete quiz
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: quizId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Quiz deleted
+
+  /api/quiz/{quizId}/questions:
+    post:
+      tags:
+        - Quiz
+      summary: Add question to quiz
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: quizId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+                - correct_answer
+              properties:
+                text:
+                  type: string
+                type:
+                  type: string
+                  enum: [text, multiple_choice]
+                options:
+                  type: array
+                  items:
+                    type: string
+                correct_answer:
+                  type: string
+                explanation:
+                  type: string
+      responses:
+        '201':
+          description: Question added
+
+  /api/quiz/questions/{questionId}:
+    put:
+      tags:
+        - Quiz
+      summary: Update question
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Question updated
+
+    delete:
+      tags:
+        - Quiz
+      summary: Delete question
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Question deleted
+
+  /api/quiz/{quizId}/start:
+    post:
+      tags:
+        - Quiz
+      summary: Start quiz attempt
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: quizId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Attempt started
+
+  /api/quiz/attempts/{attemptId}/answer:
+    post:
+      tags:
+        - Quiz
+      summary: Submit answer for a question
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: attemptId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - questionId
+                - answer
+              properties:
+                questionId:
+                  type: string
+                answer:
+                  type: string
+      responses:
+        '200':
+          description: Answer submitted
+
+  /api/quiz/attempts/{attemptId}/complete:
+    post:
+      tags:
+        - Quiz
+      summary: Complete quiz attempt
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: attemptId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Attempt completed with score
+
+  /api/quiz/attempts/{attemptId}/results:
+    get:
+      tags:
+        - Quiz
+      summary: Get attempt results
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: attemptId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detailed results
+
+  /api/quiz/my-attempts:
+    get:
+      tags:
+        - Quiz
+      summary: Get my quiz attempts
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: List of attempts

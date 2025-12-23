@@ -1,6 +1,11 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import env from './env.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const options = {
   definition: {
@@ -12,8 +17,8 @@ const options = {
       contact: { name: 'HUSTUDENT Team' }
     },
     servers: [
-      { url: `http://localhost:${env.PORT}/api`, description: 'Development server' },
-      { url: 'https://hustudent.onrender.com/api', description: 'Production server' }
+      { url: `http://localhost:${env.PORT}/`, description: 'Development server' },
+      { url: 'https://hustudent.onrender.com/', description: 'Production server' }
     ],
     components: {
       securitySchemes: {
@@ -126,10 +131,9 @@ const options = {
       { bearerAuth: [] }
     ]
   },
-  // Scan route files for JSDoc annotations
+  // Load swagger documentation from YAML files
   apis: [
-    './routes/*.js',
-    './controllers/*.js'
+    join(__dirname, '../docs/swagger/*.yaml')
   ]
 };
 
@@ -137,3 +141,4 @@ const swaggerSpec = swaggerJsdoc(options);
 
 export { swaggerUi, swaggerSpec };
 export default swaggerSpec;
+

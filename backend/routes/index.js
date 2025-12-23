@@ -20,7 +20,6 @@ router.use('/chats', chatRoutes);
 router.use('/quiz', quizRoutes);
 router.use('/matching', matchingRoutes);
 
-
 // Default API info
 router.get('/', (req, res) => {
   res.json({

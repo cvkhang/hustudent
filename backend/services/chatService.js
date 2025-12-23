@@ -1,11 +1,10 @@
 
-import db from '../models/index.js';
+
+import { Message, MessageAttachment, Chat, Friendship, User, FriendRequest, GroupMember } from '../models/index.js';
 import { AppError, ErrorCodes } from '../utils/errors.js';
 import { Op } from 'sequelize';
 import socketManager from '../socket/socketManager.js';
 import uploadService from './uploadService.js';
-
-const { Message, MessageAttachment, Chat, Friendship, User, FriendRequest, GroupMember } = db;
 
 /**
  * Core Chat Service

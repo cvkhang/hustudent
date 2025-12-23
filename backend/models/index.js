@@ -153,8 +153,8 @@ Notification.belongsTo(User, { foreignKey: 'sender_id', as: 'sender' });
 // EXPORTS
 // ============================================
 
-// Default export for backward compatibility
-export default {
+// Named exports
+export {
   sequelize,
   Sequelize,
   User,
@@ -188,3 +188,4 @@ export default {
   QuizAttempt,
   Notification
 };
+
