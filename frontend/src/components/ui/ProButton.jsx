@@ -1,7 +1,7 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 
-const ProButton = ({ children, variant = "primary", className = "", icon: Icon, isLoading, ...props }) => {
+const ProButton = ({ children, variant = "primary", className = "", icon: Icon, iconPosition = "right", isLoading, ...props }) => {
   const variants = {
     primary: "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-clay-btn hover:shadow-glow-primary hover:scale-[1.02]",
     secondary: "bg-white text-slate-700 shadow-clay-btn hover:text-primary-600 hover:scale-[1.02]",
