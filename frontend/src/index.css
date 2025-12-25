@@ -1,8 +1,102 @@
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  --font-heading: "Baloo 2", cursive;
+  --font-body: "Nunito", sans-serif;
+
+  /* Colors */
+  --color-primary-50: #eef2ff;
+  --color-primary-100: #e0e7ff;
+  --color-primary-200: #c7d2fe;
+  --color-primary-300: #a5b4fc;
+  --color-primary-400: #818cf8;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+
+  --color-secondary-50: #fdf2f8;
+  --color-secondary-100: #fce7f3;
+  --color-secondary-200: #fbcfe8;
+  --color-secondary-300: #f9a8d4;
+  --color-secondary-400: #f472b6;
+  --color-secondary-500: #ec4899;
+  --color-secondary-600: #db2777;
+
+  --color-accent-blue: #60A5FA;
+  --color-accent-purple: #A78BFA;
+  --color-accent-orange: #FB923C;
+  --color-accent-green: #34D399;
+  --color-accent-yellow: #FBBF24;
+  --color-accent-coral: #FF7F50;
+  --color-accent-teal: #2DD4BF;
+  --color-accent-cyan: #22d3ee;
+
+  --color-clay-bg: #eef2f6;
+  --color-clay-card: rgba(255, 255, 255, 0.75);
+  --color-clay-border: rgba(255, 255, 255, 0.7);
+
+  /* Shadows */
+  --shadow-clay-card: 20px 20px 40px #d1d9e6, -20px -20px 40px #ffffff;
+  --shadow-clay-card-hover: 15px 15px 30px #d1d9e6, -15px -15px 30px #ffffff;
+  --shadow-clay-card-sm: 10px 10px 20px #d1d9e6, -10px -10px 20px #ffffff;
+  --shadow-clay-inner: inset 4px 4px 8px #dae0fdff, inset -4px -4px 8px #ffffff;
+  --shadow-clay-btn: 8px 8px 16px #b8b9be, -8px -8px 16px #ffffff;
+  --shadow-glow-primary: 0 0 12px rgba(99, 102, 241, 0.4);
+  --shadow-glow-accent: 0 0 12px rgba(249, 115, 22, 0.4);
+
+  /* Animations */
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-slow: float 8s ease-in-out infinite;
+  --animate-float-delayed: float 7s ease-in-out 2s infinite;
+  --animate-morph: morph 8s ease-in-out infinite;
+  --animate-fade-in-up: fadeInUp 0.4s ease-out forwards;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-bounce-slow: bounce 3s infinite;
+
+  /* Keyframes */
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes morph {
+
+    0%,
+    100% {
+      borderRadius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    }
+
+    50% {
+      borderRadius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    }
+  }
+
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Background Image */
+  --background-image-gradient-mesh: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+  radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.15) 0px, transparent 50%),
+  radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+  radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.15) 0px, transparent 50%);
+}
 
 @layer base {
   body {
@@ -20,60 +114,63 @@
   }
 }
 
+@utility scrollbar-hide {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@utility no-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Global scrollbar hiding as requested */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@utility perspective-1000 {
+  perspective: 1000px;
+}
+
+@utility transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+@utility backface-hidden {
+  backface-visibility: hidden;
+}
+
+@utility rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
 @layer utilities {
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Hide scrollbar for IE, Edge and Firefox */
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    /* IE and Edge */
-    scrollbar-width: none;
-    /* Firefox */
-  }
-
-  /* Global scrollbar hiding as requested */
-  ::-webkit-scrollbar {
-    display: none;
-  }
-
-  * {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  /* Card Flip Utilities */
-  .perspective-1000 {
-    perspective: 1000px;
-  }
-
-  .transform-style-3d {
-    transform-style: preserve-3d;
-  }
-
-  .backface-hidden {
-    backface-visibility: hidden;
-  }
-
-  .rotate-y-180 {
-    transform: rotateY(180deg);
-  }
 
   /* Animations */
   @keyframes bounce-small {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-5px);
+    }
   }
 
   .animate-bounce-small {

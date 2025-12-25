@@ -96,7 +96,9 @@ export const MainLayout = ({ children }) => {
         <div className="h-full p-6 flex flex-col">
           {/* Logo */}
           <div className="flex items-center gap-3 px-2 ml-2 mb-10 shrink-0">
-            <Logo size="sm" />
+            <Link to="/home">
+              <Logo size="sm" />
+            </Link>
           </div>
 
           {/* Nav Links */}
@@ -149,7 +151,7 @@ export const MainLayout = ({ children }) => {
 
             <button
               onClick={logout}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-500 transition-colors font-bold"
+              className="w-full flex items-center gap-3 px-4 py-3 mt-2 rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-500 transition-colors font-bold"
             >
               <LogOut size={20} />
               Đăng xuất

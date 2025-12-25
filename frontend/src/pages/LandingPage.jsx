@@ -311,7 +311,7 @@ const CoursePreviewSection = () => {
         <div className="grid gap-6">
           {[
             { tag: "CNTT", title: "Cấu trúc dữ liệu & Giải thuật", members: 120, quiz: 15, accent: "bg-accent-blue" },
-            { tag: "Toán", title: "Giải tích 3 - Đa biến", members: 85, quiz: 8, accent: "bg-accent-purple" },
+            { tag: "Toán", title: "Giải tích 3", members: 85, quiz: 8, accent: "bg-accent-purple" },
             { tag: "Lý", title: "Vật lý đại cương 1", members: 200, quiz: 24, accent: "bg-accent-orange" },
           ].map((c, idx) => (
             <div key={idx} className={`

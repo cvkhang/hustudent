@@ -28,7 +28,8 @@ export default function FlashcardStudy() {
   // Local State for Smart Queue
   const [studyQueue, setStudyQueue] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [sessionStats, setSessionStats] = useState({ known: 0, unknown: 0, reviews: 0 });
+  const [sessionStats, setSessionStats] = useState({ known: 0, unknown: 0 });
+  const [forgottenCardIds, setForgottenCardIds] = useState(new Set());
 
   // UI State
   const [isFlipped, setIsFlipped] = useState(false);
@@ -150,9 +151,13 @@ export default function FlashcardStudy() {
     // 1. Update Stats
     setSessionStats(prev => ({
       ...prev,
-      [status]: prev[status] + 1,
-      reviews: status === 'unknown' ? prev.reviews + 1 : prev.reviews
+      [status]: prev[status] + 1
     }));
+
+    // Track unique forgotten cards
+    if (status === 'unknown') {
+      setForgottenCardIds(prev => new Set([...prev, cardToProcess.id]));
+    }
 
     // 2. Animate
     cardControls.start({
@@ -223,7 +228,8 @@ export default function FlashcardStudy() {
     setStudyQueue(initialCards); // Reset to original
     setCurrentIndex(0);
     setStreak(0);
-    setSessionStats({ known: 0, unknown: 0, reviews: 0 });
+    setSessionStats({ known: 0, unknown: 0 });
+    setForgottenCardIds(new Set());
     cardControls.set({ x: 0, opacity: 1, rotate: 0 });
   };
 
@@ -346,7 +352,7 @@ export default function FlashcardStudy() {
               <p className="text-xs font-bold text-slate-400 uppercase">Đã thuộc</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-black text-orange-500">{sessionStats.reviews}</p>
+              <p className="text-3xl font-black text-orange-500">{forgottenCardIds.size}</p>
               <p className="text-xs font-bold text-slate-400 uppercase">Cần ôn lại</p>
             </div>
           </div>
