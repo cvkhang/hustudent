@@ -1,12 +1,12 @@
-const { Op } = require('sequelize');
-const { User, FriendRequest, Friendship, sequelize } = require('../models');
-const { AppError, ErrorCodes } = require('../utils/errors');
-const { getIO } = require('../socket/socketManager');
+import { Op } from 'sequelize';
+import { User, FriendRequest, Friendship, sequelize } from '../models/index.js';
+import { AppError, ErrorCodes } from '../utils/errors.js';
+import { getIO } from '../socket/socketManager.js';
 
 /**
  * Send friend request
  */
-const sendFriendRequest = async (fromUserId, toUserId) => {
+export const sendFriendRequest = async (fromUserId, toUserId) => {
   // Can't send request to self
   if (fromUserId === toUserId) {
     throw new AppError(ErrorCodes.VALIDATION_ERROR, 'Cannot send friend request to yourself');
@@ -77,7 +77,7 @@ const sendFriendRequest = async (fromUserId, toUserId) => {
 /**
  * Get friend requests (incoming or outgoing)
  */
-const getFriendRequests = async (userId, type = 'incoming') => {
+export const getFriendRequests = async (userId, type = 'incoming') => {
   const where = type === 'incoming'
     ? { to_user_id: userId }
     : { from_user_id: userId };
@@ -98,7 +98,7 @@ const getFriendRequests = async (userId, type = 'incoming') => {
 /**
  * Accept friend request
  */
-const acceptFriendRequest = async (userId, requestId) => {
+export const acceptFriendRequest = async (userId, requestId) => {
   const request = await FriendRequest.findByPk(requestId);
 
   if (!request) {
@@ -140,7 +140,7 @@ const acceptFriendRequest = async (userId, requestId) => {
 /**
  * Reject friend request
  */
-const rejectFriendRequest = async (userId, requestId) => {
+export const rejectFriendRequest = async (userId, requestId) => {
   const request = await FriendRequest.findByPk(requestId);
 
   if (!request) {
@@ -160,7 +160,7 @@ const rejectFriendRequest = async (userId, requestId) => {
 /**
  * Cancel outgoing friend request
  */
-const cancelFriendRequest = async (userId, requestId) => {
+export const cancelFriendRequest = async (userId, requestId) => {
   const request = await FriendRequest.findByPk(requestId);
 
   if (!request) {
@@ -180,7 +180,7 @@ const cancelFriendRequest = async (userId, requestId) => {
 /**
  * Get list of friends
  */
-const getFriends = async (userId, { q, page = 1, limit = 20 }) => {
+export const getFriends = async (userId, { q, page = 1, limit = 20 }) => {
   const offset = (page - 1) * limit;
 
   // Find all accepted friendships involving this user
@@ -235,7 +235,7 @@ const getFriends = async (userId, { q, page = 1, limit = 20 }) => {
 /**
  * Unfriend a user
  */
-const unfriend = async (userId, friendUserId) => {
+export const unfriend = async (userId, friendUserId) => {
   const { userLow, userHigh } = Friendship.getOrderedIds(userId, friendUserId);
 
   const friendship = await Friendship.findOne({
@@ -258,7 +258,7 @@ const unfriend = async (userId, friendUserId) => {
 /**
  * Block a user
  */
-const blockUser = async (userId, targetUserId) => {
+export const blockUser = async (userId, targetUserId) => {
   if (userId === targetUserId) {
     throw new AppError(ErrorCodes.VALIDATION_ERROR, 'Cannot block yourself');
   }
@@ -303,7 +303,7 @@ const blockUser = async (userId, targetUserId) => {
 /**
  * Unblock a user
  */
-const unblockUser = async (userId, targetUserId) => {
+export const unblockUser = async (userId, targetUserId) => {
   const { userLow, userHigh } = Friendship.getOrderedIds(userId, targetUserId);
 
   const friendship = await Friendship.findOne({
@@ -331,7 +331,7 @@ const unblockUser = async (userId, targetUserId) => {
 /**
  * Get friendship status between two users
  */
-const getFriendshipStatus = async (userId, otherUserId) => {
+export const getFriendshipStatus = async (userId, otherUserId) => {
   if (userId === otherUserId) {
     return 'self';
   }
@@ -366,7 +366,7 @@ const getFriendshipStatus = async (userId, otherUserId) => {
 /**
  * Get blocked users list
  */
-const getBlockedUsers = async (userId, { page = 1, limit = 20 } = {}) => {
+export const getBlockedUsers = async (userId, { page = 1, limit = 20 } = {}) => {
   const offset = (page - 1) * limit;
 
   // Find all blocked friendships where action_user_id is the current user
@@ -409,7 +409,7 @@ const getBlockedUsers = async (userId, { page = 1, limit = 20 } = {}) => {
 /**
  * Get friend suggestions
  */
-const getSuggestions = async (userId, { limit = 10 } = {}) => {
+export const getSuggestions = async (userId, { limit = 10 } = {}) => {
   const user = await User.findByPk(userId);
   if (!user) return [];
 
@@ -443,7 +443,7 @@ const getSuggestions = async (userId, { limit = 10 } = {}) => {
   return suggestions;
 };
 
-module.exports = {
+export default {
   sendFriendRequest,
   getFriendRequests,
   acceptFriendRequest,

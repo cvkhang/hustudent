@@ -1,5 +1,3 @@
-
-
 import { Message, MessageAttachment, Chat, Friendship, User, FriendRequest, GroupMember } from '../models/index.js';
 import { AppError, ErrorCodes } from '../utils/errors.js';
 import { Op } from 'sequelize';

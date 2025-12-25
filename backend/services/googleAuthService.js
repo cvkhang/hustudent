@@ -1,15 +1,17 @@
-const { OAuth2Client } = require('google-auth-library');
-const { User, AuthRefreshToken } = require('../models');
-const { generateTokens, hashToken } = require('../utils/jwt');
-const { AppError, ErrorCodes } = require('../utils/errors');
+import { OAuth2Client } from 'google-auth-library';
+import { User, AuthRefreshToken } from '../models/index.js';
+import { signAccessToken, signRefreshToken, getRefreshTokenExpiry } from '../utils/jwt.js';
+import { hashToken } from '../utils/crypto.js';
+import { AppError, ErrorCodes } from '../utils/errors.js';
+import env from '../config/env.js';
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_ID = env.GOOGLE_CLIENT_ID; // Use env config
 const client = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
 
 /**
  * Verify Google ID token and get user info
  */
-const verifyGoogleToken = async (idToken) => {
+export const verifyGoogleToken = async (idToken) => {
   if (!client) {
     throw new AppError(ErrorCodes.SERVER_ERROR, 'Google OAuth not configured');
   }
@@ -36,7 +38,7 @@ const verifyGoogleToken = async (idToken) => {
 /**
  * Login or register with Google
  */
-const googleLogin = async (idToken) => {
+export const googleLogin = async (idToken) => {
   const googleUser = await verifyGoogleToken(idToken);
 
   // Check email domain (optional - for HUST students)
@@ -77,26 +79,21 @@ const googleLogin = async (idToken) => {
   }
 
   // Generate tokens
-  const { accessToken, refreshToken } = generateTokens(user.id);
+  const accessToken = signAccessToken(user.id);
+  const refreshToken = signRefreshToken(user.id);
 
   // Store refresh token
   await AuthRefreshToken.create({
     user_id: user.id,
     token_hash: hashToken(refreshToken),
-    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+    expires_at: getRefreshTokenExpiry()
   });
 
   return {
-    user: {
-      id: user.id,
-      email: user.email,
-      full_name: user.full_name,
-      avatar_url: user.avatar_url,
-      auth_provider: user.auth_provider || 'google'
-    },
+    user: user.toJSON(), // Assuming toJSON handles safe fields
     accessToken,
     refreshToken
   };
 };
 
-module.exports = { verifyGoogleToken, googleLogin };
+export default { verifyGoogleToken, googleLogin };

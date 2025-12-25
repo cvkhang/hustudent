@@ -4,9 +4,9 @@ import GroupMember from '../models/GroupMember.js';
 import StudySession from '../models/StudySession.js';
 import SessionRsvp from '../models/SessionRsvp.js';
 
-export const getStudyGroups = (req, res) => {
+export const getStudyGroups = async (req, res) => {
   try {
-    const groups = Group.findAll();
+    const groups = await Group.findAll();
     res.status(200).json({
       success: true,
       data: groups

@@ -10,4 +10,4 @@ router.patch('/:answerId', questionController.updateAnswer);
 router.delete('/:answerId', questionController.deleteAnswer);
 router.post('/:answerId/vote', questionController.voteAnswer);
 
-module.exports = router;
+export default router;

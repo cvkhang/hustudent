@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import userController from '../controllers/userController.js';
+import { authenticate } from '../middleware/auth.js';
+
 const router = express.Router();
-const userController = require('../controllers/userController');
-const { authenticate } = require('../middleware/auth');
 
 // GET /api/me - Get current user profile (protected)
 router.get('/me', authenticate, userController.getProfile);
@@ -19,4 +20,4 @@ router.get('/users/:id', authenticate, userController.getUserById);
 router.post('/users/:id/block', authenticate, userController.blockUser);
 router.delete('/users/:id/block', authenticate, userController.unblockUser);
 
-module.exports = router;
+export default router;

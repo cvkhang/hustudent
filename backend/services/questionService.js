@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import { User, Question, Answer, AnswerVote, Group, sequelize } from '../models.js';
+import { User, Question, Answer, AnswerVote, Group, sequelize } from '../models/index.js';
 import { AppError, ErrorCodes } from '../utils/errors.js';
 
 const createQuestion = async (userId, { title, content, tags, visibility = 'public', groupId, attachment_url, attachment_name }) => {

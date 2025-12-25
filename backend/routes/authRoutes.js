@@ -1,7 +1,9 @@
-const express = require('express');
+import express from 'express';
+import authController from '../controllers/authController.js';
+import googleAuthService from '../services/googleAuthService.js';
+import { authenticate } from '../middleware/auth.js';
+
 const router = express.Router();
-const authController = require('../controllers/authController');
-const googleAuthService = require('../services/googleAuthService');
 
 // POST /api/auth/register
 router.post('/register', authController.register);
@@ -28,8 +30,7 @@ router.post('/refresh', authController.refresh);
 router.post('/logout', authController.logout);
 
 // POST /api/auth/change-password
-const { authenticate } = require('../middleware/auth');
 router.post('/change-password', authenticate, authController.changePassword);
 
-module.exports = router;
+export default router;
 

@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import friendController from '../controllers/friendController.js';
+import { authenticate } from '../middleware/auth.js';
+
 const router = express.Router();
-const friendController = require('../controllers/friendController');
-const { authenticate } = require('../middleware/auth');
 
 // All friend routes require authentication
 router.use(authenticate);
@@ -23,4 +24,4 @@ router.delete('/:userId', friendController.unfriend);
 router.post('/:userId/block', friendController.blockUser);
 router.post('/:userId/unblock', friendController.unblockUser);
 
-module.exports = router;
+export default router;

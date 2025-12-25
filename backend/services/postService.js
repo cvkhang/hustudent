@@ -78,7 +78,7 @@ const getPostById = async (postId, userId = null) => {
 /**
  * Get feed posts
  */
-const getFeed = async (userId, { scope = 'public', groupId, tag, q, subject, page = 1, limit = 20 }) => {
+const getFeed = async (userId, { scope = 'public', groupId, tag, q, subject, author_id, page = 1, limit = 20 }) => {
   const where = { deleted_at: null };
 
   if (scope === 'group' && groupId) {
@@ -100,8 +100,8 @@ const getFeed = async (userId, { scope = 'public', groupId, tag, q, subject, pag
   }
 
   // Support filtering by author (My Documents)
-  if (arguments[1].author_id) {
-    where.author_id = arguments[1].author_id;
+  if (author_id) {
+    where.author_id = author_id;
   }
 
   const offset = (page - 1) * limit;

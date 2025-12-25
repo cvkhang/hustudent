@@ -1,10 +1,10 @@
-const friendService = require('../services/friendService');
-const { AppError, ErrorCodes } = require('../utils/errors');
+import friendService from '../services/friendService.js';
+import { AppError, ErrorCodes } from '../utils/errors.js';
 
 /**
  * POST /friends/requests
  */
-const sendFriendRequest = async (req, res, next) => {
+export const sendFriendRequest = async (req, res, next) => {
   try {
     const { toUserId } = req.body;
 
@@ -23,7 +23,7 @@ const sendFriendRequest = async (req, res, next) => {
 /**
  * GET /friends/requests
  */
-const getFriendRequests = async (req, res, next) => {
+export const getFriendRequests = async (req, res, next) => {
   try {
     const { type = 'incoming' } = req.query;
 
@@ -42,7 +42,7 @@ const getFriendRequests = async (req, res, next) => {
 /**
  * POST /friends/requests/:requestId/accept
  */
-const acceptFriendRequest = async (req, res, next) => {
+export const acceptFriendRequest = async (req, res, next) => {
   try {
     const result = await friendService.acceptFriendRequest(req.userId, req.params.requestId);
 
@@ -55,7 +55,7 @@ const acceptFriendRequest = async (req, res, next) => {
 /**
  * POST /friends/requests/:requestId/reject
  */
-const rejectFriendRequest = async (req, res, next) => {
+export const rejectFriendRequest = async (req, res, next) => {
   try {
     const result = await friendService.rejectFriendRequest(req.userId, req.params.requestId);
 
@@ -68,7 +68,7 @@ const rejectFriendRequest = async (req, res, next) => {
 /**
  * DELETE /friends/requests/:requestId
  */
-const cancelFriendRequest = async (req, res, next) => {
+export const cancelFriendRequest = async (req, res, next) => {
   try {
     const result = await friendService.cancelFriendRequest(req.userId, req.params.requestId);
 
@@ -81,7 +81,7 @@ const cancelFriendRequest = async (req, res, next) => {
 /**
  * GET /friends
  */
-const getFriends = async (req, res, next) => {
+export const getFriends = async (req, res, next) => {
   try {
     const { q, page, limit } = req.query;
 
@@ -100,7 +100,7 @@ const getFriends = async (req, res, next) => {
 /**
  * DELETE /friends/:userId
  */
-const unfriend = async (req, res, next) => {
+export const unfriend = async (req, res, next) => {
   try {
     const result = await friendService.unfriend(req.userId, req.params.userId);
 
@@ -113,7 +113,7 @@ const unfriend = async (req, res, next) => {
 /**
  * POST /friends/:userId/block
  */
-const blockUser = async (req, res, next) => {
+export const blockUser = async (req, res, next) => {
   try {
     const result = await friendService.blockUser(req.userId, req.params.userId);
 
@@ -126,7 +126,7 @@ const blockUser = async (req, res, next) => {
 /**
  * POST /friends/:userId/unblock
  */
-const unblockUser = async (req, res, next) => {
+export const unblockUser = async (req, res, next) => {
   try {
     const result = await friendService.unblockUser(req.userId, req.params.userId);
 
@@ -139,7 +139,7 @@ const unblockUser = async (req, res, next) => {
 /**
  * GET /friends/blocked
  */
-const getBlockedUsers = async (req, res, next) => {
+export const getBlockedUsers = async (req, res, next) => {
   try {
     const { page, limit } = req.query;
 
@@ -157,7 +157,7 @@ const getBlockedUsers = async (req, res, next) => {
 /**
  * GET /friends/suggestions
  */
-const getSuggestions = async (req, res, next) => {
+export const getSuggestions = async (req, res, next) => {
   try {
     const { limit } = req.query;
     const suggestions = await friendService.getSuggestions(req.userId, {
@@ -169,7 +169,7 @@ const getSuggestions = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export default {
   sendFriendRequest,
   getFriendRequests,
   acceptFriendRequest,

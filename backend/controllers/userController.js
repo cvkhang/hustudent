@@ -1,12 +1,9 @@
-const userService = require('../services/userService');
+import userService from '../services/userService.js';
 
 /**
  * GET /me
  */
-/**
- * GET /me
- */
-const getProfile = async (req, res, next) => {
+export const getProfile = async (req, res, next) => {
   try {
     const [stats, activities] = await Promise.all([
       userService.getProfileStats(req.userId),
@@ -28,7 +25,7 @@ const getProfile = async (req, res, next) => {
 /**
  * PATCH /me
  */
-const updateProfile = async (req, res, next) => {
+export const updateProfile = async (req, res, next) => {
   try {
     const updatedUser = await userService.updateProfile(req.userId, req.body);
 
@@ -41,7 +38,7 @@ const updateProfile = async (req, res, next) => {
 /**
  * GET /users
  */
-const searchUsers = async (req, res, next) => {
+export const searchUsers = async (req, res, next) => {
   try {
     const { q, major, academicYear, page, limit } = req.query;
 
@@ -62,7 +59,7 @@ const searchUsers = async (req, res, next) => {
 /**
  * GET /users/:id
  */
-const getUserById = async (req, res, next) => {
+export const getUserById = async (req, res, next) => {
   try {
     const user = await userService.getUserById(req.params.id);
 
@@ -75,7 +72,7 @@ const getUserById = async (req, res, next) => {
 /**
  * POST /users/:id/block
  */
-const blockUser = async (req, res, next) => {
+export const blockUser = async (req, res, next) => {
   try {
     await userService.blockUser(req.userId, req.params.id);
     res.json({ message: 'Blocked successfully' });
@@ -87,7 +84,7 @@ const blockUser = async (req, res, next) => {
 /**
  * DELETE /users/:id/block (Unblock)
  */
-const unblockUser = async (req, res, next) => {
+export const unblockUser = async (req, res, next) => {
   try {
     await userService.unblockUser(req.userId, req.params.id);
     res.json({ message: 'Unblocked successfully' });
@@ -96,7 +93,7 @@ const unblockUser = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export default {
   getProfile,
   updateProfile,
   searchUsers,

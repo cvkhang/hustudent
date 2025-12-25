@@ -1,10 +1,10 @@
-const authService = require('../services/authService');
-const { AppError, ErrorCodes, validationError } = require('../utils/errors');
+import authService from '../services/authService.js';
+import { ErrorCodes, validationError, AppError } from '../utils/errors.js';
 
 /**
  * POST /auth/register
  */
-const register = async (req, res, next) => {
+export const register = async (req, res, next) => {
   try {
     const { email, password, fullName } = req.body;
 
@@ -33,7 +33,7 @@ const register = async (req, res, next) => {
 /**
  * POST /auth/login
  */
-const login = async (req, res, next) => {
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -72,7 +72,7 @@ const login = async (req, res, next) => {
 /**
  * POST /auth/refresh
  */
-const refresh = async (req, res, next) => {
+export const refresh = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
 
@@ -91,7 +91,7 @@ const refresh = async (req, res, next) => {
 /**
  * POST /auth/logout
  */
-const logout = async (req, res, next) => {
+export const logout = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
 
@@ -109,7 +109,7 @@ const logout = async (req, res, next) => {
 /**
  * POST /auth/change-password
  */
-const changePassword = async (req, res, next) => {
+export const changePassword = async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body;
 
@@ -129,7 +129,7 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export default {
   register,
   login,
   refresh,

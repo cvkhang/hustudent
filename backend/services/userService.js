@@ -1,10 +1,12 @@
-const { User } = require('../models');
-const { AppError, ErrorCodes } = require('../utils/errors');
+import { Op } from 'sequelize';
+import { User, FlashcardProgress, QuizAttempt, GroupMember, Post, Question, Answer, FlashcardSet, Friendship } from '../models/index.js';
+import { AppError, ErrorCodes } from '../utils/errors.js';
+import { MAJORS, ACADEMIC_YEARS } from '../config/constant.js';
 
 /**
  * Get user by ID
  */
-const getUserById = async (userId) => {
+export const getUserById = async (userId) => {
   const user = await User.findByPk(userId);
 
   if (!user || user.deleted_at) {
@@ -17,7 +19,7 @@ const getUserById = async (userId) => {
 /**
  * Update user profile
  */
-const updateProfile = async (userId, updates) => {
+export const updateProfile = async (userId, updates) => {
   const user = await User.findByPk(userId);
 
   if (!user || user.deleted_at) {
@@ -45,8 +47,6 @@ const updateProfile = async (userId, updates) => {
   }
 
   // VALIDATION: Ensure Major and Academic Year are valid
-  const { MAJORS, ACADEMIC_YEARS } = require('../config/constants');
-
   if (filteredUpdates.major && !MAJORS.includes(filteredUpdates.major)) {
     throw new AppError(ErrorCodes.VALIDATION_ERROR, `Ngành học không hợp lệ. Phải thuộc: ${MAJORS.join(', ')}`);
   }
@@ -63,9 +63,7 @@ const updateProfile = async (userId, updates) => {
 /**
  * Search users (for discovery)
  */
-const searchUsers = async ({ q, major, academicYear, page = 1, limit = 20 }) => {
-  const { Op } = require('sequelize');
-
+export const searchUsers = async ({ q, major, academicYear, page = 1, limit = 20 }) => {
   const where = {
     deleted_at: null
   };
@@ -109,10 +107,7 @@ const searchUsers = async ({ q, major, academicYear, page = 1, limit = 20 }) => 
 /**
  * Get profile stats
  */
-const getProfileStats = async (userId) => {
-  const { FlashcardProgress, QuizAttempt, GroupMember, Post, Question, Answer } = require('../models');
-  const { Op } = require('sequelize');
-
+export const getProfileStats = async (userId) => {
   // Parallelize counts for better performance
   const [flashcardCount, quizCount, groupCount, postsCount, questionsCount, answersCount] = await Promise.all([
     // Count distinct flashcards reviewed
@@ -142,14 +137,12 @@ const getProfileStats = async (userId) => {
 /**
  * Get recent activity
  */
-const getRecentActivity = async (userId) => {
-  const { QuizAttempt, GroupMember, FlashcardSet, User } = require('../models');
-
+export const getRecentActivity = async (userId) => {
   const activities = [];
 
   // Get recent quiz attempts
   const recentQuizzes = await QuizAttempt.findAll({
-    where: { user_id: userId, completed_at: { [require('sequelize').Op.ne]: null } },
+    where: { user_id: userId, completed_at: { [Op.ne]: null } },
     include: ['quiz'],
     limit: 3,
     order: [['completed_at', 'DESC']]
@@ -212,10 +205,7 @@ const getRecentActivity = async (userId) => {
 /**
  * Block a user
  */
-const blockUser = async (currentUserId, targetUserId) => {
-  const { Friendship } = require('../models');
-  const { Op } = require('sequelize');
-
+export const blockUser = async (currentUserId, targetUserId) => {
   if (currentUserId === targetUserId) {
     throw new AppError(ErrorCodes.VALIDATION_ERROR, 'Cannot block yourself');
   }
@@ -246,9 +236,7 @@ const blockUser = async (currentUserId, targetUserId) => {
 /**
  * Unblock a user
  */
-const unblockUser = async (currentUserId, targetUserId) => {
-  const { Friendship } = require('../models');
-
+export const unblockUser = async (currentUserId, targetUserId) => {
   const { userLow, userHigh } = Friendship.getOrderedIds(currentUserId, targetUserId);
 
   const friendship = await Friendship.findOne({
@@ -276,7 +264,7 @@ const unblockUser = async (currentUserId, targetUserId) => {
   return { message: 'Unblocked successfully' };
 };
 
-module.exports = {
+export default {
   getUserById,
   updateProfile,
   searchUsers,

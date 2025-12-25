@@ -1,12 +1,12 @@
-const { User, AuthRefreshToken } = require('../models');
-const { hashPassword, comparePassword, hashToken } = require('../utils/crypto');
-const { signAccessToken, signRefreshToken, verifyToken, getRefreshTokenExpiry } = require('../utils/jwt');
-const { AppError, ErrorCodes } = require('../utils/errors');
+import { User, AuthRefreshToken } from '../models/index.js';
+import { hashPassword, comparePassword, hashToken } from '../utils/crypto.js';
+import { signAccessToken, signRefreshToken, verifyToken, getRefreshTokenExpiry } from '../utils/jwt.js';
+import { AppError, ErrorCodes } from '../utils/errors.js';
 
 /**
  * Register a new user
  */
-const register = async ({ email, password, fullName }) => {
+export const register = async ({ email, password, fullName }) => {
   // Check if user exists
   const existingUser = await User.findOne({ where: { email } });
   if (existingUser) {
@@ -45,7 +45,7 @@ const register = async ({ email, password, fullName }) => {
 /**
  * Login user with email/password
  */
-const login = async ({ email, password }) => {
+export const login = async ({ email, password }) => {
   // Find user with password
   const user = await User.scope('withPassword').findOne({ where: { email } });
 
@@ -85,7 +85,7 @@ const login = async ({ email, password }) => {
 /**
  * Refresh access token
  */
-const refreshAccessToken = async (refreshToken) => {
+export const refreshAccessToken = async (refreshToken) => {
   // Verify token
   let decoded;
   try {
@@ -127,7 +127,7 @@ const refreshAccessToken = async (refreshToken) => {
 /**
  * Logout - revoke refresh token
  */
-const logout = async (refreshToken) => {
+export const logout = async (refreshToken) => {
   if (!refreshToken) return;
 
   const tokenHash = hashToken(refreshToken);
@@ -141,7 +141,7 @@ const logout = async (refreshToken) => {
 /**
  * Revoke all refresh tokens for a user
  */
-const revokeAllTokens = async (userId) => {
+export const revokeAllTokens = async (userId) => {
   await AuthRefreshToken.update(
     { revoked: true },
     { where: { user_id: userId } }
@@ -151,7 +151,7 @@ const revokeAllTokens = async (userId) => {
 /**
  * Change password
  */
-const changePassword = async (userId, currentPassword, newPassword) => {
+export const changePassword = async (userId, currentPassword, newPassword) => {
   const user = await User.scope('withPassword').findByPk(userId);
 
   if (!user || user.deleted_at) {
@@ -177,7 +177,7 @@ const changePassword = async (userId, currentPassword, newPassword) => {
   return true;
 };
 
-module.exports = {
+export default {
   register,
   login,
   refreshAccessToken,
