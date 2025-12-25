@@ -6,6 +6,8 @@ import matchingRoutes from './matchingRoutes.js';
 import flashcardRoutes from './flashcardRoutes.js';
 import uploadRoutes from './uploadRoutes.js';
 import postRoutes from './postRoutes.js';
+import notificationRoutes from './notificationRoutes.js';
+import sessionRoutes from './sessionRoutes.js';
 
 const router = express.Router();
 
@@ -22,6 +24,8 @@ router.get('/health', (req, res) => {
 router.use('/groups', groupRoutes);
 router.use('/chats', chatRoutes);
 router.use('/posts', postRoutes);
+router.use('/sessions', sessionRoutes);
+router.use('/', notificationRoutes);
 router.use('/', quizRoutes);
 router.use('/', matchingRoutes);
 router.use('/', flashcardRoutes);
