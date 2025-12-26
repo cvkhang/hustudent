@@ -2,21 +2,16 @@ import { createClient } from '@supabase/supabase-js';
 import { AppError, ErrorCodes } from '../utils/errors.js';
 import path from 'path';
 import crypto from 'crypto';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.warn('Supabase credentials missing. Falling back to local storage.');
+  throw new Error('Supabase credentials missing. Please check .env file.');
 }
 
-const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const BUCKETS = {
   avatars: 'avatars',
@@ -24,11 +19,7 @@ const BUCKETS = {
   posts: 'attachments'
 };
 
-// Ensure upload dir exists for local fallback
-const UPLOAD_DIR = path.join(__dirname, '../../public/uploads');
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-}
+
 
 /**
  * Generate unique filename
@@ -83,18 +74,10 @@ export const uploadFile = async (bucket, file, folder = '') => {
  * Delete file from Supabase Storage
  */
 export const deleteFile = async (bucket, filePath) => {
-  if (supabase) {
-    const { error } = await supabase.storage
-      .from(bucket)
-      .remove([filePath]);
-    if (error) console.error('Delete error:', error);
-  } else {
-    // Local delete fallback
-    const localPath = path.join(UPLOAD_DIR, path.basename(filePath));
-    if (fs.existsSync(localPath)) {
-      fs.unlinkSync(localPath);
-    }
-  }
+  const { error } = await supabase.storage
+    .from(bucket)
+    .remove([filePath]);
+  if (error) console.error('Delete error:', error);
 };
 
 // Specific upload functions
