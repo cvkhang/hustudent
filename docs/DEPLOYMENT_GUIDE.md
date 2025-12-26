@@ -408,26 +408,166 @@ FRONTEND_URL=https://www.hustudent.id.vn
 
 ### 6.1. Bảo mật Layers
 
+HUStudent triển khai bảo mật theo mô hình **Defense in Depth** với nhiều lớp bảo vệ:
+
 #### **Layer 1: Network Security**
-- Cloudflare WAF: Chặn request bất thường
-- EC2 Security Group:
+- **Cloudflare WAF**: Chặn request bất thường, SQL injection, XSS
+- **EC2 Security Group**:
   - Chỉ mở Port 22 (SSH) cho IP admin
   - Chỉ mở Port 80/443 cho Cloudflare IP ranges
-- Rate Limiting: 100 req/10s/IP (Cloudflare)
+- **Rate Limiting**: 
+  - General API: 2000 req/15min/IP
+  - Login: 5 attempts/15min
+  - Register: 3 attempts/hour
+  - Password change: 3 attempts/15min
 
 #### **Layer 2: Application Security**
-- **CORS**: Chỉ cho phép `FRONTEND_URL` gọi API
-- **JWT**: Access Token (1h expiry) + Refresh Token (7d)
-- **Input Validation**: Express-validator cho mọi endpoint
-- **SQL Injection**: Sequelize ORM (parameterized queries)
-- **File Upload**: Kiểm tra MIME type, giới hạn size (<5MB)
+
+##### **A. Security Headers (Helmet.js)**
+```javascript
+// Được cấu hình tự động trong app.js
+✅ Content-Security-Policy (CSP)
+✅ X-Frame-Options: DENY (chống clickjacking)
+✅ X-Content-Type-Options: nosniff (chống MIME sniffing)
+✅ Strict-Transport-Security (HSTS - production)
+✅ X-XSS-Protection: 1; mode=block
+```
+
+**Kiểm tra Security Headers:**
+```bash
+curl -I https://api.hustudent.id.vn/api/health
+```
+
+##### **B. Input Validation & Sanitization**
+```javascript
+// Tự động áp dụng cho mọi endpoint
+✅ XSS Protection - Loại bỏ <script>, event handlers
+✅ NoSQL Injection Protection - Sanitize $ và .
+✅ SQL Injection Protection - Sequelize ORM
+✅ Input Validation - express-validator
+```
+
+**Middleware được áp dụng:**
+- `sanitizeNoSQL` - Bảo vệ NoSQL injection
+- `sanitizeAll` - Loại bỏ XSS payloads
+- Validation chains cho từng endpoint
+
+##### **C. Authentication & Authorization**
+- **JWT Token**: 
+  - Access Token (1h expiry)
+  - HTTP-only cookies (không thể truy cập từ JavaScript)
+  - Secure flag trong production
+  - SameSite: strict (chống CSRF)
+- **Password Security**: 
+  - bcrypt hashing với salt
+  - Minimum 6 characters
+  - Không lưu plain text
+- **CORS**: Chỉ cho phép `FRONTEND_URL` truy cập API
+
+##### **D. File Upload Security**
+```javascript
+✅ MIME type validation
+✅ File size limit (<5MB)
+✅ Sanitize filename
+✅ Secure storage (Supabase)
+```
 
 #### **Layer 3: Data Security**
 - **Encryption at Rest**: Supabase mặc định mã hóa ổ đĩa
-- **Encryption in Transit**: SSL/TLS cho DB connection
-- **Secrets**: Không commit file `.env`, dùng environment variables
+- **Encryption in Transit**: 
+  - SSL/TLS cho tất cả connections
+  - Database connection SSL required trong production
+- **Secrets Management**: 
+  - Không commit file `.env`
+  - GitHub Secrets cho CI/CD
+  - Environment variables trong production
 
-### 6.2. Performance Optimization
+### 6.2. Security Best Practices
+
+#### **Environment Variables (Production)**
+```bash
+# Backend .env (trên EC2)
+NODE_ENV=production
+DATABASE_URL=postgresql://...?ssl=true
+SUPABASE_URL=https://...
+SUPABASE_SERVICE_ROLE_KEY=<strong-key>
+JWT_SECRET=<256-bit-random-secret>
+FRONTEND_URL=https://www.hustudent.id.vn
+
+# Frontend environment (build time)
+VITE_API_URL=https://api.hustudent.id.vn
+VITE_SOCKET_URL=https://api.hustudent.id.vn
+```
+
+#### **Security Checklist Before Production**
+
+**Backend:**
+- [x] Helmet.js configured
+- [x] Rate limiting enabled
+- [x] Input validation on all endpoints
+- [x] XSS & NoSQL injection protection
+- [x] CORS properly configured
+- [x] JWT secrets are strong and unique
+- [x] Database SSL enabled
+- [x] Error messages don't expose sensitive info
+- [ ] SSL certificate for backend (optional - Cloudflare handles)
+
+**Frontend:**
+- [x] DOMPurify installed for XSS protection
+- [ ] All user inputs sanitized before display
+- [ ] No hardcoded API keys
+- [x] HTTPS enforced
+
+**Infrastructure:**
+- [ ] EC2 Security Group limited to Cloudflare IPs
+- [ ] SSH key-based auth (no password)
+- [ ] Firewall rules configured
+- [ ] Regular security updates
+- [ ] Backup strategy implemented
+
+#### **Monitoring Security**
+
+```bash
+# 1. Check failed login attempts
+docker compose logs backend | grep "LOGIN_FAILED"
+
+# 2. Check rate limit hits
+docker compose logs backend | grep "TOO_MANY"
+
+# 3. Monitor suspicious requests
+# Cloudflare Dashboard > Security > Events
+
+# 4. Check for vulnerabilities
+cd backend && npm audit
+cd frontend && npm audit
+
+# 5. Update dependencies
+npm audit fix
+```
+
+#### **Incident Response**
+
+**If compromised:**
+1. **Immediate**: Rotate all secrets (JWT_SECRET, DB password)
+2. **Invalidate**: All active JWT tokens (restart backend)
+3. **Review**: Logs for unauthorized access
+4. **Update**: Dependencies and patch vulnerabilities
+5. **Notify**: Affected users if data breach
+
+### 6.3. Advanced Security (Future Enhancements)
+
+**Recommended Additions:**
+- [ ] CSRF tokens for state-changing operations
+- [ ] Two-factor authentication (2FA)
+- [ ] API key rotation mechanism
+- [ ] Intrusion detection system (IDS)
+- [ ] Regular penetration testing
+- [ ] Security audit logs
+- [ ] Automated vulnerability scanning (Snyk, OWASP ZAP)
+
+**See Also:** [📄 SECURITY.md](./SECURITY.md) - Comprehensive security documentation
+
+### 6.4. Performance Optimization
 
 #### **Frontend**
 - **Code Splitting**: React.lazy() cho route-based splitting → 120KB → 40KB initial
