@@ -25,7 +25,7 @@ const chatAPI = {
     return res.data.data;
   },
   createChat: async (userId) => {
-    const res = await api.post('/chats', { peerUserId: userId });
+    const res = await api.post('/chats', { otherUserId: userId });
     return res.data.data;
   },
   getMessages: async (chatId) => {
