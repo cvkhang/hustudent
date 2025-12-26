@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import swaggerUi from 'swagger-ui-express';
 import cookieParser from 'cookie-parser';
@@ -7,9 +8,51 @@ import cookieParser from 'cookie-parser';
 import routes from './routes/index.js';
 import swaggerSpec from './config/swagger.js';
 import errorHandler from './middleware/errorHandler.js';
+import { sanitizeNoSQL, sanitizeAll } from './middleware/security.js';
 import { env } from './config/env.js';
 
 const app = express();
+
+// ==========================================
+// SECURITY MIDDLEWARE
+// ==========================================
+
+// Helmet - Security headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // Allow embedding from same origin
+  crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow CORS
+}));
+
+// XSS Protection (legacy browsers)
+app.use(helmet.xssFilter());
+
+// Prevent clickjacking
+app.use(helmet.frameguard({ action: 'deny' }));
+
+// Prevent MIME sniffing
+app.use(helmet.noSniff());
+
+// HSTS - Force HTTPS in production
+if (env.NODE_ENV === 'production') {
+  app.use(helmet.hsts({
+    maxAge: 31536000, // 1 year
+    includeSubDomains: true,
+    preload: true
+  }));
+}
 
 // CORS configuration
 app.use(cors({
@@ -39,6 +82,13 @@ app.use('/api', limiter);
 app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// NoSQL Injection Protection
+app.use(sanitizeNoSQL);
+
+// XSS Protection - Sanitize all inputs
+app.use(sanitizeAll);
+
 
 // API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
