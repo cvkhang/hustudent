@@ -14,7 +14,7 @@
 ## Overview
 
 Hệ thống **Chat** hỗ trợ nhắn tin real-time giữa các users và trong groups, sử dụng **Socket.IO** cho WebSocket connections và HTTP REST API cho message history.
-Xác thực hỗ trợ cả **Cookie** và **Authorization Header** (Bearer Token) cho REST API, trong khi WebSocket connection ưu tiên sử dụng Cookie cho handshake ban đầu.
+Xác thực hỗ trợ cả **Cookie** (token/accessToken) và **Authorization Header** (Bearer Token). WebSocket connection ưu tiên kiểm tra Header trước, sau đó đến Cookie, và cuối cùng là Handshake Auth.
 
 ### Key Features
 
@@ -196,22 +196,51 @@ CREATE TABLE message_attachments (
 ws://localhost:5000/socket.io
 ```
 
-**Authentication:**
+**Authentication Methods:**
+1. **Authorization Header (Best for Mobile/API):**
 ```javascript
-// Client connects with HTTP-only cookie
+// Authorization: Bearer <token>
 io.connect('http://localhost:5000', {
-  withCredentials: true  // Send cookies
+  extraHeaders: {
+    Authorization: `Bearer ${token}`
+  }
 });
 ```
 
-**Server authenticates via middleware:**
+2. **Cookie (Best for Web):**
+```javascript
+// Browser automatically sends 'token' or 'accessToken' cookie
+io.connect('http://localhost:5000', {
+  withCredentials: true
+});
+```
+
+3. **Handshake Auth (Alternative):**
+```javascript
+io.connect('http://localhost:5000', {
+  auth: { token: '...' }
+});
+```
+
+**Server Authentication Logic:**
 ```javascript
 io.use((socket, next) => {
-  const cookies = parseCookies(socket.handshake.headers.cookie);
-  const token = cookies.token;
-  const decoded = verifyToken(token);
-  socket.userId = decoded.userId;
-  next();
+  let token = null;
+  
+  // 1. Check Authorization Header
+  const authHeader = socket.handshake.headers.authorization;
+  if (authHeader?.startsWith('Bearer ')) token = authHeader.split(' ')[1];
+  
+  // 2. Check Cookes
+  if (!token) {
+    const cookies = parseCookies(socket.handshake.headers.cookie);
+    token = cookies.token || cookies.accessToken;
+  }
+  
+  // 3. Check Auth Object
+  if (!token) token = socket.handshake.auth?.token;
+  
+  // ... Verify token ...
 });
 ```
 
@@ -418,8 +447,24 @@ export const init = (server) => {
   // Authentication Middleware
   io.use((socket, next) => {
     try {
-      const cookies = parseCookies(socket.handshake.headers.cookie);
-      const token = cookies.token;
+      let token = null;
+
+      // 1. Check Authorization Header (Bearer Token)
+      const authHeader = socket.handshake.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+      }
+
+      // 2. Check Cookies if no header token found
+      if (!token && socket.handshake.headers.cookie) {
+        const cookies = parseCookies(socket.handshake.headers.cookie);
+        token = cookies.token || cookies.accessToken;
+      }
+
+      // 3. Check Handshake Auth Object
+      if (!token && socket.handshake.auth && socket.handshake.auth.token) {
+        token = socket.handshake.auth.token;
+      }
       
       if (!token) {
         return next(new Error('Authentication error: No token found'));

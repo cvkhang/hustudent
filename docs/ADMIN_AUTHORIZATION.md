@@ -72,7 +72,7 @@ role: {
 
 ## API Endpoints
 
-Tất cả các endpoints dưới đây đều yêu cầu xác thực qua **Cookie** (`token=...`) hoặc **Header** (`Authorization: Bearer <token>`). Yêu cầu quyền **Admin**.
+Tất cả các endpoints dưới đây đều yêu cầu xác thực qua **Cookie** (`token=...` hoặc `accessToken=...`) hoặc **Header** (`Authorization: Bearer <token>`). Yêu cầu quyền **Admin**.
 
 ### 1. Dashboard Statistics
 

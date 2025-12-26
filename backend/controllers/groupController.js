@@ -2,6 +2,7 @@
 import { Op } from 'sequelize';
 import Group from '../models/Group.js';
 import GroupMember from '../models/GroupMember.js';
+import User from '../models/User.js';
 import StudySession from '../models/StudySession.js';
 import SessionRsvp from '../models/SessionRsvp.js';
 
@@ -193,6 +194,38 @@ export const getGroupDetail = async (req, res) => {
     res.status(200).json({
       success: true,
       data: group
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+export const getGroupMembers = async (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const group = await Group.findByPk(parseInt(groupId));
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        error: 'Group not found'
+      });
+    }
+
+    const members = await GroupMember.findAll({
+      where: { group_id: parseInt(groupId) },
+      include: [{
+        model: User, // Ensure User is imported
+        as: 'user', // Ensure association alias matches (usually 'user')
+        attributes: ['id', 'full_name', 'email', 'avatar_url', 'role']
+      }]
+    });
+
+    res.status(200).json({
+      success: true,
+      data: members
     });
   } catch (error) {
     res.status(500).json({

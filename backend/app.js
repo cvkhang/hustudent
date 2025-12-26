@@ -56,7 +56,14 @@ if (env.NODE_ENV === 'production') {
 
 // CORS configuration
 app.use(cors({
-  origin: env.FRONTEND_URL || 'http://localhost:5173',
+  origin: [
+    env.FRONTEND_URL,
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://hustudent.id.vn',
+    'https://www.hustudent.id.vn',
+    'https://api.hustudent.id.vn'
+  ].filter(Boolean),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],

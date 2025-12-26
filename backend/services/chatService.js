@@ -102,13 +102,15 @@ class ChatService {
       if (chat.type === 'group') {
         // Emit to group room? Or simply to everyone in the group if they joined a room?
         // For now, let's assume we use a room `chat-{chatId}`
+        console.log(`[ChatService] Emitting group message to room chat-${chat.id}`);
         io.to(`chat-${chat.id}`).emit('receive_message', message);
       } else {
         // Direct
+        console.log(`[ChatService] Emitting direct message to user ${recipientId}`);
         io.to(recipientId).emit('receive_message', message);
       }
     } catch (err) {
-      console.warn('Socket emit failed:', err.message);
+      console.warn(' [ChatService] Socket emit failed:', err.message);
     }
   }
 

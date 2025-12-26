@@ -69,6 +69,12 @@ Bảo vệ các protected routes:
 - [jwt.js](file:///d:/STUDY/HUST/Subject/Web/hustudent/backend/utils/jwt.js): Sign và verify JWT tokens
 - [crypto.js](file:///d:/STUDY/HUST/Subject/Web/hustudent/backend/utils/crypto.js): Hash passwords và tokens
 
+#### 5. **Socket Authentication** ([socketManager.js](file:///d:/STUDY/HUST/Subject/Web/hustudent/backend/socket/socketManager.js))
+Hỗ trợ đa phương thức xác thực cho Real-time connection:
+- **Authorization Header**: `Bearer <token>` (Ưu tiên cao nhất)
+- **Cookies**: Kiểm tra `token` hoặc `accessToken`
+- **Handshake Auth**: `socket.auth.token`
+
 ---
 
 ## Authentication Methods

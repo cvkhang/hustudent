@@ -42,14 +42,25 @@ export const init = (server) => {
         return next();
       }
 
-      if (!socket.handshake.headers.cookie) {
-        // No cookies, maybe allow if using header-based auth?
-        // For now failing
-        return next(new Error('Authentication error: No cookie'));
+      let token = null;
+
+      // 1. Check Authorization Header (Bearer Token)
+      const authHeader = socket.handshake.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
       }
 
-      const cookies = parseCookies(socket.handshake.headers.cookie);
-      const token = cookies.token;
+      // 2. Check Cookies if no header token found
+      if (!token && socket.handshake.headers.cookie) {
+        const cookies = parseCookies(socket.handshake.headers.cookie);
+        token = cookies.token || cookies.accessToken;
+      }
+
+      // 3. Check Handshake Auth Object (Client-side explicit auth)
+      if (!token && socket.handshake.auth && socket.handshake.auth.token) {
+        token = socket.handshake.auth.token;
+      }
+
 
       if (!token) {
         return next(new Error('Authentication error: No token found'));
@@ -61,9 +72,10 @@ export const init = (server) => {
       }
 
       socket.userId = decoded.userId;
+      console.log(`[Socket Auth] User ${socket.userId} authenticated via ${token === socket.handshake.auth?.token ? 'Handshake' : 'Cookie/Header'}`);
       next();
     } catch (err) {
-      console.error('Socket Auth Error:', err.message);
+      console.error('[Socket Auth] Error:', err.message);
       next(new Error('Authentication error'));
     }
   });
@@ -82,7 +94,7 @@ export const init = (server) => {
     socket.on('join_chat', (chatId) => {
       const room = `chat-${chatId}`;
       socket.join(room);
-      console.log(`User ${socket.userId} joined room ${room}`);
+      console.log(`📢 [Socket] User ${socket.userId} joined room ${room}`);
     });
 
     socket.on('leave_chat', (chatId) => {

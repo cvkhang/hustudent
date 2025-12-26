@@ -1,5 +1,5 @@
 import express from 'express';
-import { getStudyGroups, createGroup, joinGroup, leaveGroup, getMyGroups, getGroupDetail, createSession, getSessionsByGroup, rsvpToSession } from '../controllers/groupController.js';
+import { getStudyGroups, createGroup, joinGroup, leaveGroup, getMyGroups, getGroupDetail, getGroupMembers, createSession, getSessionsByGroup, rsvpToSession } from '../controllers/groupController.js';
 import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -11,6 +11,7 @@ router.post('/:groupId/join', authenticate, joinGroup);
 router.post('/:groupId/leave', authenticate, leaveGroup);
 router.get('/my', authenticate, getMyGroups);
 router.get('/:groupId', getGroupDetail);
+router.get('/:groupId/members', getGroupMembers);
 router.post('/:groupId/sessions', authenticate, createSession);
 router.get('/:groupId/sessions', getSessionsByGroup);
 router.post('/sessions/:sessionId/rsvp', authenticate, rsvpToSession);
