@@ -13,6 +13,7 @@ import notificationRoutes from './notificationRoutes.js';
 import sessionRoutes from './sessionRoutes.js';
 import questionRoutes from './questionRoutes.js';
 import answerRoutes from './answerRoutes.js';
+import adminRoutes from './adminRoutes.js';
 
 const router = express.Router();
 
@@ -40,6 +41,7 @@ router.use('/', quizRoutes); // Check if this should be /quizzes
 router.use('/', matchingRoutes);
 router.use('/', flashcardRoutes);
 router.use('/', uploadRoutes);
+router.use('/admin', adminRoutes);
 
 // Default API info
 router.get('/', (req, res) => {

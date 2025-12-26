@@ -53,7 +53,7 @@ export const login = async (req, res, next) => {
     res.cookie('token', result.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 60 * 60 * 1000, // 1 hour
       path: '/'
     });
@@ -98,7 +98,12 @@ export const logout = async (req, res, next) => {
     await authService.logout(refreshToken);
 
     // Clear the token cookie
-    res.clearCookie('token');
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      path: '/'
+    });
 
     res.json({ data: { message: 'Logged out successfully' } });
   } catch (error) {

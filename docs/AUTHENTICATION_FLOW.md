@@ -62,7 +62,7 @@ Chứa business logic:
 
 #### 3. **Middleware** ([auth.js](file:///d:/STUDY/HUST/Subject/Web/hustudent/backend/middleware/auth.js))
 Bảo vệ các protected routes:
-- `authenticate`: Bắt buộc phải có token
+- `authenticate`: Bắt buộc phải có token (Cookie hoặc Header `Authorization: Bearer <token>`)
 - `optionalAuth`: Token không bắt buộc
 
 #### 4. **Utilities**
@@ -154,7 +154,7 @@ sequenceDiagram
 res.cookie('token', accessToken, {
   httpOnly: true,              // Không thể truy cập từ JavaScript
   secure: NODE_ENV === 'production',  // HTTPS only in production
-  sameSite: 'strict',          // CSRF protection
+  sameSite: NODE_ENV === 'production' ? 'none' : 'lax', // Cross-site support in production
   maxAge: 3600000,             // 1 hour
   path: '/'
 });
@@ -211,8 +211,8 @@ sequenceDiagram
 ```
 
 **Lifespan:** 1 hour  
-**Storage:** HTTP-only cookie (tên: `token`)  
-**Usage:** Gửi tự động trong mọi request qua cookie
+**Storage:** HTTP-only cookie (primary) hoặc `Authorization` header (fallback)
+**Usage:** Gửi tự động qua cookie hoặc thủ công qua header `Authorization: Bearer <token>`
 
 ### Refresh Token
 

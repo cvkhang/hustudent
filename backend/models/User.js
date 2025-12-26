@@ -66,6 +66,11 @@ const User = sequelize.define('User', {
     unique: true,
     allowNull: true
   },
+  role: {
+    type: DataTypes.ENUM('user', 'admin'),
+    defaultValue: 'user',
+    allowNull: false
+  },
   // Privacy settings
   allow_message_from: {
     type: DataTypes.STRING,

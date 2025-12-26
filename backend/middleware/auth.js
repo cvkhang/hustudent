@@ -8,8 +8,12 @@ import User from '../models/User.js';
  */
 export const authenticate = async (req, res, next) => {
   try {
-    // Get token from cookie (not header!)
-    const token = req.cookies?.token;
+    let token = req.cookies?.token;
+
+    // Fallback: Check Authorization header
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
 
     if (!token) {
       throw new AppError(ErrorCodes.AUTH_REQUIRED);
@@ -81,7 +85,27 @@ export const optionalAuth = async (req, res, next) => {
   }
 };
 
-export default {
-  authenticate,
-  optionalAuth
+/**
+ * Middleware to authorize based on user roles
+ * @param {...String} roles - Allowed roles
+ */
+export const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        error: 'User not authenticated'
+      });
+    }
+
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        error: `User role ${req.user.role} is not authorized to access this route`
+      });
+    }
+    next();
+  };
 };
+
+export default { authenticate, optionalAuth, authorize };
