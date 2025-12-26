@@ -16,7 +16,7 @@
 - 📅 Lên lịch session học nhóm
 - 🏆 Theo dõi tiến độ và thành tựu học tập
 
-Hệ thống được xây dựng với **Client-Server Decoupled Architecture**, triển khai trên AWS Cloud với CI/CD tự động hóa hoàn toàn.
+Triển khai trên AWS Cloud với CI/CD.
 
 ---
 
