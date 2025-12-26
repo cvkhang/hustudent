@@ -1,12 +1,45 @@
 // Study Groups Controller
+import { Op } from 'sequelize';
 import Group from '../models/Group.js';
 import GroupMember from '../models/GroupMember.js';
 import StudySession from '../models/StudySession.js';
 import SessionRsvp from '../models/SessionRsvp.js';
 
+
 export const getStudyGroups = async (req, res) => {
   try {
-    const groups = await Group.findAll();
+    const { type, search } = req.query;
+    const userId = req.user?.id || 1; // Mock user ID
+
+    let groups = [];
+
+    if (type === 'my_groups') {
+      // Filter: only groups where user is a member
+      const myMemberships = await GroupMember.findAll({
+        where: { user_id: userId, status: 'active' },
+        include: [{
+          model: Group,
+          as: 'group',
+          where: search ? {
+            [Op.or]: [
+              { name: { [Op.iLike]: `%${search}%` } },
+              { description: { [Op.iLike]: `%${search}%` } }
+            ]
+          } : {}
+        }]
+      });
+      groups = myMemberships.map(m => m.group).filter(g => g);
+    } else {
+      // Explore: all groups (optionally filtered by search)
+      const where = search ? {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } },
+          { description: { [Op.iLike]: `%${search}%` } }
+        ]
+      } : {};
+      groups = await Group.findAll({ where });
+    }
+
     res.status(200).json({
       success: true,
       data: groups
@@ -19,7 +52,7 @@ export const getStudyGroups = async (req, res) => {
   }
 };
 
-export const createGroup = (req, res) => {
+export const createGroup = async (req, res) => {
   try {
     const { name, description } = req.body;
     const creatorId = req.user?.id || 1; // Mock user ID
@@ -31,8 +64,8 @@ export const createGroup = (req, res) => {
       });
     }
 
-    const group = Group.create(name, description, creatorId);
-    GroupMember.create(group.id, creatorId, 'admin');
+    const group = await Group.create({ name, description, owner_id: creatorId });
+    await GroupMember.create({ group_id: group.id, user_id: creatorId, role: 'admin', status: 'active' });
 
     res.status(201).json({
       success: true,
@@ -46,12 +79,12 @@ export const createGroup = (req, res) => {
   }
 };
 
-export const joinGroup = (req, res) => {
+export const joinGroup = async (req, res) => {
   try {
     const { groupId } = req.params;
     const userId = req.user?.id || 2; // Mock user ID
 
-    const group = Group.findById(parseInt(groupId));
+    const group = await Group.findByPk(parseInt(groupId));
     if (!group) {
       return res.status(404).json({
         success: false,
@@ -59,13 +92,18 @@ export const joinGroup = (req, res) => {
       });
     }
 
-    const added = GroupMember.create(group.id, userId, 'member');
-    if (!added) {
+    const existingMember = await GroupMember.findOne({
+      where: { group_id: parseInt(groupId), user_id: userId }
+    });
+
+    if (existingMember) {
       return res.status(400).json({
         success: false,
         error: 'Already a member'
       });
     }
+
+    await GroupMember.create({ group_id: parseInt(groupId), user_id: userId, role: 'member', status: 'active' });
 
     res.status(200).json({
       success: true,
@@ -79,12 +117,12 @@ export const joinGroup = (req, res) => {
   }
 };
 
-export const leaveGroup = (req, res) => {
+export const leaveGroup = async (req, res) => {
   try {
     const { groupId } = req.params;
     const userId = req.user?.id || 2; // Mock user ID
 
-    const group = Group.findById(parseInt(groupId));
+    const group = await Group.findByPk(parseInt(groupId));
     if (!group) {
       return res.status(404).json({
         success: false,
@@ -92,7 +130,18 @@ export const leaveGroup = (req, res) => {
       });
     }
 
-    GroupMember.remove(parseInt(groupId), userId);
+    const member = await GroupMember.findOne({
+      where: { group_id: parseInt(groupId), user_id: userId }
+    });
+
+    if (!member) {
+      return res.status(404).json({
+        success: false,
+        error: 'Not a member of this group'
+      });
+    }
+
+    await member.destroy();
 
     res.status(200).json({
       success: true,
@@ -106,11 +155,17 @@ export const leaveGroup = (req, res) => {
   }
 };
 
-export const getMyGroups = (req, res) => {
+export const getMyGroups = async (req, res) => {
   try {
     const userId = req.user?.id || 1; // Mock user ID
-    const myMemberships = GroupMember.findByUser(userId);
-    const groups = myMemberships.map(m => Group.findById(m.groupId)).filter(g => g);
+    const myMemberships = await GroupMember.findAll({
+      where: { user_id: userId, status: 'active' },
+      include: [{
+        model: Group,
+        as: 'group'
+      }]
+    });
+    const groups = myMemberships.map(m => m.group).filter(g => g);
 
     res.status(200).json({
       success: true,
@@ -124,10 +179,10 @@ export const getMyGroups = (req, res) => {
   }
 };
 
-export const getGroupDetail = (req, res) => {
+export const getGroupDetail = async (req, res) => {
   try {
     const { groupId } = req.params;
-    const group = Group.findById(parseInt(groupId));
+    const group = await Group.findByPk(parseInt(groupId));
     if (!group) {
       return res.status(404).json({
         success: false,
@@ -147,13 +202,13 @@ export const getGroupDetail = (req, res) => {
   }
 };
 
-export const createSession = (req, res) => {
+export const createSession = async (req, res) => {
   try {
     const { groupId } = req.params;
     const { title, description, dateTime } = req.body;
     const creatorId = req.user?.id || 1;
 
-    const group = Group.findById(parseInt(groupId));
+    const group = await Group.findByPk(parseInt(groupId));
     if (!group) {
       return res.status(404).json({
         success: false,
@@ -161,7 +216,13 @@ export const createSession = (req, res) => {
       });
     }
 
-    const session = StudySession.create(parseInt(groupId), title, description, dateTime, creatorId);
+    const session = await StudySession.create({
+      group_id: parseInt(groupId),
+      title,
+      description,
+      scheduled_at: dateTime,
+      creator_id: creatorId
+    });
 
     res.status(201).json({
       success: true,
@@ -175,12 +236,12 @@ export const createSession = (req, res) => {
   }
 };
 
-export const getSessionsByGroup = (req, res) => {
+export const getSessionsByGroup = async (req, res) => {
   try {
     const { groupId } = req.params;
     const { type } = req.query; // 'upcoming' or 'past'
 
-    const group = Group.findById(parseInt(groupId));
+    const group = await Group.findByPk(parseInt(groupId));
     if (!group) {
       return res.status(404).json({
         success: false,
@@ -188,19 +249,29 @@ export const getSessionsByGroup = (req, res) => {
       });
     }
 
-    let sessions;
+    const where = { group_id: parseInt(groupId) };
+    const now = new Date();
+
     if (type === 'upcoming') {
-      sessions = StudySession.findUpcomingByGroup(parseInt(groupId));
+      where.start_time = { [Op.gte]: now };
     } else if (type === 'past') {
-      sessions = StudySession.findPastByGroup(parseInt(groupId));
-    } else {
-      sessions = StudySession.findByGroup(parseInt(groupId));
+      where.start_time = { [Op.lt]: now };
     }
 
+    const sessions = await StudySession.findAll({
+      where,
+      order: [['start_time', type === 'past' ? 'DESC' : 'ASC']]
+    });
+
     // Add attendee count to each session
-    const sessionsWithCount = sessions.map(session => ({
-      ...session,
-      attendeeCount: RSVP.getAttendeeCount(session.id)
+    const sessionsWithCount = await Promise.all(sessions.map(async (session) => {
+      const attendeeCount = await SessionRsvp.count({
+        where: { session_id: session.id, status: 'yes' }
+      });
+      return {
+        ...session.toJSON(),
+        attendeeCount
+      };
     }));
 
     res.status(200).json({
@@ -215,13 +286,13 @@ export const getSessionsByGroup = (req, res) => {
   }
 };
 
-export const rsvpToSession = (req, res) => {
+export const rsvpToSession = async (req, res) => {
   try {
     const { sessionId } = req.params;
     const { status } = req.body; // 'yes', 'no', 'cancel'
     const userId = req.user?.id || 1;
 
-    const session = StudySession.findById(parseInt(sessionId));
+    const session = await StudySession.findByPk(parseInt(sessionId));
     if (!session) {
       return res.status(404).json({
         success: false,
@@ -236,7 +307,11 @@ export const rsvpToSession = (req, res) => {
       });
     }
 
-    const rsvp = RSVP.create(parseInt(sessionId), userId, status);
+    const rsvp = await SessionRsvp.create({
+      session_id: parseInt(sessionId),
+      user_id: userId,
+      status
+    });
 
     res.status(200).json({
       success: true,
