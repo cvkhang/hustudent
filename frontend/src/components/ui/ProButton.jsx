@@ -3,9 +3,9 @@ import { Loader2 } from 'lucide-react';
 
 const ProButton = ({ children, variant = "primary", className = "", icon: Icon, iconPosition = "right", isLoading, ...props }) => {
   const variants = {
-    primary: "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-clay-btn hover:shadow-glow-primary hover:scale-[1.02]",
+    primary: "bg-linear-to-r from-primary-500 to-primary-600 text-white shadow-clay-btn hover:shadow-glow-primary hover:scale-[1.02]",
     secondary: "bg-white text-slate-700 shadow-clay-btn hover:text-primary-600 hover:scale-[1.02]",
-    accent: "bg-gradient-to-r from-accent-orange to-red-500 text-white shadow-clay-btn hover:shadow-glow-accent hover:scale-[1.02]",
+    accent: "bg-linear-to-r from-accent-orange to-red-500 text-white shadow-clay-btn hover:shadow-glow-accent hover:scale-[1.02]",
     ghost: "bg-transparent text-slate-600 hover:bg-white/50 hover:text-primary-600",
   };
 
@@ -28,7 +28,7 @@ const ProButton = ({ children, variant = "primary", className = "", icon: Icon, 
         {!isLoading && Icon && <Icon size={20} className="transition-transform group-hover:translate-x-1" />}
       </span>
       {/* Glossy overlay swipe */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-700 ease-in-out" />
+      <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-700 ease-in-out" />
     </button>
   );
 };

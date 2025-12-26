@@ -33,7 +33,11 @@ const PostsPage = lazy(() => import('@/pages/PostsPage'));
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 const QuestionDetailPage = lazy(() => import('@/pages/QuestionDetailPage'));
 const GroupDetailPage = lazy(() => import('./pages/GroupDetailPage'));
+import AdminRoute from '@/components/AdminRoute';
 const SchedulePage = lazy(() => import('@/pages/SchedulePage'));
+// const AdminRoute = lazy(() => import('@/components/AdminRoute')); // Removed lazy
+const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
+const AdminUsersPage = lazy(() => import('@/pages/admin/AdminUsersPage'));
 
 // Redirect to Home if already logged in
 const PublicRoute = ({ children }) => {
@@ -214,6 +218,24 @@ function AppRoutes() {
           <MainLayout>
             <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full" /></div>}>
               <SchedulePage />
+            </Suspense>
+          </MainLayout>
+        } />
+      </Route>
+
+      {/* Admin Routes */}
+      <Route element={<AdminRoute />}>
+        <Route path="/admin" element={
+          <MainLayout>
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full" /></div>}>
+              <AdminDashboardPage />
+            </Suspense>
+          </MainLayout>
+        } />
+        <Route path="/admin/users" element={
+          <MainLayout>
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full" /></div>}>
+              <AdminUsersPage />
             </Suspense>
           </MainLayout>
         } />

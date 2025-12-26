@@ -75,6 +75,16 @@ export const MainLayout = ({ children }) => {
     }
   ];
 
+  if (user?.role === 'admin') {
+    navGroups.push({
+      title: 'Quản Trị',
+      items: [
+        { label: 'Admin Dashboard', icon: Settings, to: '/admin' },
+        { label: 'Quản lý Users', icon: Users, to: '/admin/users' },
+      ]
+    });
+  }
+
   const isMessagesPage = location.pathname.startsWith('/messages');
 
   return (

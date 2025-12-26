@@ -11,7 +11,7 @@ const ClayCard = ({ children, className = "", hoverEffect = true }) => (
     ${className}
   `}>
     {/* Shine effect on top left */}
-    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/40 to-transparent opacity-50 pointer-events-none rounded-[2.5rem]" />
+    <div className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-white/40 to-transparent opacity-50 pointer-events-none rounded-[2.5rem]" />
     {children}
   </div>
 );

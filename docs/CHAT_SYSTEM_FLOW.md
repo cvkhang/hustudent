@@ -14,6 +14,7 @@
 ## Overview
 
 Hệ thống **Chat** hỗ trợ nhắn tin real-time giữa các users và trong groups, sử dụng **Socket.IO** cho WebSocket connections và HTTP REST API cho message history.
+Xác thực hỗ trợ cả **Cookie** và **Authorization Header** (Bearer Token) cho REST API, trong khi WebSocket connection ưu tiên sử dụng Cookie cho handshake ban đầu.
 
 ### Key Features
 
@@ -720,6 +721,8 @@ async markChatAsRead(userId, chatId) {
 ```http
 POST /api/chats/direct
 Cookie: token=...
+# OR
+Authorization: Bearer <token>
 Content-Type: application/json
 
 {
