@@ -9,19 +9,8 @@ services:
     env_file:
       - ./backend/.env
     restart: always
-    networks:
-      - hustudent-network
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: hustudent-frontend
-    ports:
-      - "80:80"
-    restart: always
-    depends_on:
-      - backend
+    environment:
+      - PORT=3000
     networks:
       - hustudent-network
 
