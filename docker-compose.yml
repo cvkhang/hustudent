@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: hustudent-backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    restart: always
+    networks:
+      - hustudent-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: hustudent-frontend
+    ports:
+      - "80:80"
+    restart: always
+    depends_on:
+      - backend
+    networks:
+      - hustudent-network
+
+networks:
+  hustudent-network:
+    driver: bridge
