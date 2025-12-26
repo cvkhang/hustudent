@@ -1,11 +1,9 @@
-# 🎓 HUStudent - Platform Học tập Xã hội
+#  HUStudent - Platform Học tập Xã hội
 
 > Hệ thống quản lý học tập và kết nối sinh viên toàn diện với kiến trúc hiện đại, bảo mật cao và khả năng mở rộng tốt.
 
 [![Deployment](https://img.shields.io/badge/Deployment-AWS-orange?logo=amazon-aws)](https://www.hustudent.id.vn)
 [![CDN](https://img.shields.io/badge/CDN-Cloudflare-blue?logo=cloudflare)](https://cloudflare.com)
-[![License](https://img.shields.io/badge/License-ISC-green)](LICENSE)
-
 ---
 
 ## 📖 Giới thiệu
