@@ -81,6 +81,27 @@ jobs:
             # Login to Docker Hub (bắt buộc nếu repo là Private)
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
             
+            # Create/Update .env file
+            cat <<EOF > backend/.env
+            PORT=3000
+            NODE_ENV=production
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            JWT_EXPIRES_IN=1h
+            REFRESH_TOKEN_EXPIRES_IN=7d
+            FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+            SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+            SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            GOOGLE_CALLBACK_URL=${{ secrets.GOOGLE_CALLBACK_URL }}
+            SMTP_HOST=${{ secrets.SMTP_HOST }}
+            SMTP_PORT=${{ secrets.SMTP_PORT }}
+            SMTP_USER=${{ secrets.SMTP_USER }}
+            SMTP_PASS=${{ secrets.SMTP_PASS }}
+            EMAIL_FROM=${{ secrets.EMAIL_FROM }}
+            EOF
+            
             # Pull image mới nhất
             docker pull ${{ secrets.DOCKER_USERNAME }}/hustudent-backend:latest
             
