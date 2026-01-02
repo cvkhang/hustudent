@@ -69,9 +69,9 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Pull image mới nhất
-            docker pull ${{ secrets.DOCKER_USERNAME }}/hustudent-backend:latest
-            
+            # Cleanup space
+            docker system prune -af --volumes
+
             # Restart backend container
             # (Giả sử bạn đang chạy docker compose, lệnh này sẽ update container)
             # Pull code mới nhất (update docker-compose.yml nếu có)
