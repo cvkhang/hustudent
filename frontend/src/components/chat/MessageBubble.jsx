@@ -1,32 +1,53 @@
 import React from 'react';
 import { Check, CheckCheck, FileText, Download } from 'lucide-react';
-import ProButton from '../ui/ProButton';
+import { formatMessageTime } from '@/utils/timeFormat';
+
+const TimestampTooltip = ({ time, status, isOwn }) => (
+  <div className={`absolute top-1/2 -translate-y-1/2 pointer-events-none z-10
+    opacity-0 group-hover/bubble:opacity-100 transition-all duration-200 scale-95 group-hover/bubble:scale-100
+    ${isOwn ? 'right-full mr-2' : 'left-full ml-2'}
+  `}>
+    <div className="flex items-center gap-1 px-2 py-1 bg-slate-800 text-white text-[10px] rounded-md shadow-lg whitespace-nowrap">
+      <span>{time}</span>
+      {isOwn && (
+        status === 'seen'
+          ? <CheckCheck size={10} className="text-primary-300" />
+          : <Check size={10} className="text-slate-400" />
+      )}
+    </div>
+  </div>
+);
 
 const MessageBubble = ({ message, isOwn, showAvatar, otherUser }) => {
   const { content, created_at, status, attachments } = message;
-  const time = new Date(created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  const time = formatMessageTime(created_at);
+
+  const hasAttachments = attachments && attachments.length > 0;
+  const hasContent = !!content;
 
   return (
-    <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'} mb-3 group`}>
+    <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'} mb-1 group`}>
       {/* Avatar for other user */}
       {!isOwn && (
-        <div className="w-8 h-8 mr-2 flex-shrink-0 self-end">
-          {showAvatar && (
+        <div className="w-8 h-8 mr-2 shrink-0 self-end">
+          {showAvatar ? (
             otherUser?.avatar_url ? (
               <img src={otherUser.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-xs font-bold">
                 {otherUser?.full_name?.charAt(0) || '?'}
               </div>
             )
+          ) : (
+            <div className="w-8 h-8" />
           )}
         </div>
       )}
 
-      <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
+      <div className={`relative flex flex-col ${isOwn ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
         {/* Attachments */}
-        {attachments && attachments.length > 0 && (
-          <div className={`flex flex-col gap-1 mb-1 ${isOwn ? 'items-end' : 'items-start'}`}>
+        {hasAttachments && (
+          <div className={`relative group/bubble flex flex-col gap-1 mb-1 ${isOwn ? 'items-end' : 'items-start'}`}>
             {attachments.map(att => (
               <div key={att.id} className="overflow-hidden rounded-xl">
                 {att.type === 'image' ? (
@@ -47,28 +68,23 @@ const MessageBubble = ({ message, isOwn, showAvatar, otherUser }) => {
                 )}
               </div>
             ))}
+            {/* Show tooltip on attachments only if no text content */}
+            {!hasContent && <TimestampTooltip time={time} status={status} isOwn={isOwn} />}
           </div>
         )}
 
-        {/* Text Content */}
-        {content && (
-          <div className={`relative px-4 py-2 rounded-2xl break-all whitespace-pre-wrap ${isOwn
-            ? 'bg-primary-500 text-white rounded-br-sm'
-            : 'bg-white text-slate-800 rounded-bl-sm border border-slate-200 shadow-sm'
-            }`}>
-            <p className="text-sm leading-relaxed">{content}</p>
+        {/* Text Content with Tooltip */}
+        {hasContent && (
+          <div className="relative group/bubble">
+            <div className={`relative px-4 py-2 rounded-2xl break-all whitespace-pre-wrap cursor-default ${isOwn
+              ? 'bg-primary-500 text-white rounded-br-sm'
+              : 'bg-white text-slate-800 rounded-bl-sm border border-slate-200 shadow-sm'
+              }`}>
+              <p className="text-sm leading-relaxed">{content}</p>
+            </div>
+            <TimestampTooltip time={time} status={status} isOwn={isOwn} />
           </div>
         )}
-
-        {/* Meta (Time & Status) */}
-        <div className={`flex items-center gap-1 mt-1 px-1 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-          <span className="text-[10px] text-slate-400">{time}</span>
-          {isOwn && (
-            status === 'seen'
-              ? <CheckCheck size={12} className="text-primary-500" />
-              : <Check size={12} className="text-slate-400" />
-          )}
-        </div>
       </div>
     </div>
   );

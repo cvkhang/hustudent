@@ -31,32 +31,32 @@ const attachmentFilter = (req, file, cb) => {
   }
 };
 
-// Upload middlewares
-const uploadAvatar = multer({
+// Upload middlewares (raw multer instances)
+const multerAvatar = multer({
   storage,
   fileFilter: imageFilter,
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 }).single('avatar');
 
-const uploadImages = multer({
+const multerImages = multer({
   storage,
   fileFilter: imageFilter,
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB
 }).array('images', 5);
 
-const uploadAttachment = multer({
+const multerAttachment = multer({
   storage,
   fileFilter: attachmentFilter,
   limits: { fileSize: 20 * 1024 * 1024 } // 20MB
 }).single('file');
 
-const uploadCover = multer({
+const multerCover = multer({
   storage,
   fileFilter: imageFilter,
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 }).single('cover');
 
-const uploadChatAttachments = multer({
+const multerChatAttachments = multer({
   storage,
   fileFilter: attachmentFilter,
   limits: { fileSize: 20 * 1024 * 1024 } // 20MB per file
@@ -76,25 +76,17 @@ const handleUpload = (uploadMiddleware) => (req, res, next) => {
   });
 };
 
-export {
-  handleUpload as uploadAvatar,
-  handleUpload as uploadCover,
-  handleUpload as uploadImages,
-  handleUpload as uploadAttachment,
-  handleUpload as uploadChatAttachments
-};
-
-// Named exports with wrapped handlers
-export const avatar = handleUpload(uploadAvatar);
-export const cover = handleUpload(uploadCover);
-export const images = handleUpload(uploadImages);
-export const attachment = handleUpload(uploadAttachment);
-export const chatAttachments = handleUpload(uploadChatAttachments);
+// Wrapped middlewares
+export const uploadAvatar = handleUpload(multerAvatar);
+export const uploadCover = handleUpload(multerCover);
+export const uploadImages = handleUpload(multerImages);
+export const uploadAttachment = handleUpload(multerAttachment);
+export const uploadChatAttachments = handleUpload(multerChatAttachments);
 
 export default {
-  uploadAvatar: handleUpload(uploadAvatar),
-  uploadCover: handleUpload(uploadCover),
-  uploadImages: handleUpload(uploadImages),
-  uploadAttachment: handleUpload(uploadAttachment),
-  uploadChatAttachments: handleUpload(uploadChatAttachments)
+  uploadAvatar,
+  uploadCover,
+  uploadImages,
+  uploadAttachment,
+  uploadChatAttachments
 };

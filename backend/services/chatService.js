@@ -83,7 +83,7 @@ class ChatService {
     // 6. Update Chat timestamp
     await Chat.update(
       { updated_at: new Date() },
-      { where: { id: chatId } } // Removed validate: false as it might conflict depending on sequelize version
+      { where: { id: chatId }, validate: false }
     );
 
     // 7. Emit Socket Event
