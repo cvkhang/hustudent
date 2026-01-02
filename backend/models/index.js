@@ -5,6 +5,7 @@ import sequelize from '../config/database.js';
 // Authentication & Users
 import User from './User.js';
 import AuthRefreshToken from './AuthRefreshToken.js';
+import PasswordResetToken from './PasswordResetToken.js';
 
 // Friends
 import FriendRequest from './FriendRequest.js';
@@ -57,6 +58,10 @@ import Notification from './Notification.js';
 // === User <-> AuthRefreshToken ===
 User.hasMany(AuthRefreshToken, { foreignKey: 'user_id', as: 'refreshTokens' });
 AuthRefreshToken.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+// === User <-> PasswordResetToken ===
+User.hasMany(PasswordResetToken, { foreignKey: 'user_id', as: 'resetTokens' });
+PasswordResetToken.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
 // === User <-> FriendRequest ===
 User.hasMany(FriendRequest, { foreignKey: 'from_user_id', as: 'sentRequests' });
@@ -186,6 +191,7 @@ export {
   Quiz,
   QuizQuestion,
   QuizAttempt,
-  Notification
+  Notification,
+  PasswordResetToken
 };
 

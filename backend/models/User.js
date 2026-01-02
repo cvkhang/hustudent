@@ -82,6 +82,20 @@ const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: 'public' // public | friends | private
   },
+  // Ban status
+  is_banned: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
+  },
+  banned_at: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  ban_reason: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   // Timestamps
   deleted_at: {
     type: DataTypes.DATE,

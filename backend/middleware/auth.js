@@ -41,6 +41,11 @@ export const authenticate = async (req, res, next) => {
       throw new AppError(ErrorCodes.AUTH_INVALID_TOKEN, 'User not found');
     }
 
+    // Check if user is banned
+    if (user.is_banned) {
+      throw new AppError(ErrorCodes.FORBIDDEN, 'Your account has been banned');
+    }
+
     // Attach user to request
     req.user = user;
     req.userId = user.id;

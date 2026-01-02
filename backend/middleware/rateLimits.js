@@ -50,7 +50,7 @@ export const registerLimiter = rateLimit({
 // Rate limit for password changes
 export const passwordChangeLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 3, // 3 password change attempts per 15 minutes
+  max: 20, // 20 password change attempts per 15 minutes
   message: {
     error: {
       code: 'TOO_MANY_PASSWORD_CHANGES',

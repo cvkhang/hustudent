@@ -15,8 +15,8 @@ const server = app.listen(PORT, async () => {
     await sequelize.authenticate();
     console.log('Database connected');
 
-    // Sync database models
-    await sequelize.sync();
+    // Sync database models (alter: true will add new columns without dropping data)
+    await sequelize.sync({ alter: true });
     console.log('Database synced');
   } catch (error) {
     console.log('Database error:', error.message);

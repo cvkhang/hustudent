@@ -126,3 +126,127 @@ export const updateUserRole = async (req, res) => {
     });
   }
 };
+
+/**
+ * Get single user by ID (Admin only)
+ */
+export const getUserById = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findByPk(userId, {
+      attributes: { exclude: ['password_hash'] }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Delete user (Admin only)
+ */
+export const deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const adminId = req.user.id;
+
+    // Prevent self-deletion
+    if (parseInt(userId) === adminId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Cannot delete your own account'
+      });
+    }
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    // Soft delete - set deleted_at timestamp
+    user.deleted_at = new Date();
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'User deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Ban or Unban user (Admin only)
+ */
+export const toggleBanUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { ban, reason } = req.body;
+    const adminId = req.user.id;
+
+    // Prevent self-ban
+    if (parseInt(userId) === adminId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Cannot ban your own account'
+      });
+    }
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    if (ban) {
+      user.is_banned = true;
+      user.banned_at = new Date();
+      user.ban_reason = reason || 'Violated community guidelines';
+    } else {
+      user.is_banned = false;
+      user.banned_at = null;
+      user.ban_reason = null;
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: ban ? 'User banned successfully' : 'User unbanned successfully',
+      data: {
+        id: user.id,
+        email: user.email,
+        is_banned: user.is_banned
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};

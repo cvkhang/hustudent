@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { getUsers, updateUserRole } from '@/features/admin/api/admin';
+import { getUsers, updateUserRole, getUserById, deleteUser, toggleBanUser } from '@/features/admin/api/admin';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import ClayCard from '@/components/ui/ClayCard';
 import { Input } from '@/components/ui/Input';
 import ProButton from '@/components/ui/ProButton';
-import { Search, ShieldAlert, ArrowLeft, ChevronLeft, ChevronRight, UserCog, ChevronDown } from 'lucide-react';
+import { Search, ShieldAlert, ArrowLeft, ChevronLeft, ChevronRight, UserCog, ChevronDown, Eye, Trash2, Ban, CheckCircle, X, User, Mail, Calendar, GraduationCap, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const AdminUsersPage = () => {
@@ -15,6 +15,13 @@ const AdminUsersPage = () => {
   const [roleFilter, setRoleFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // New states for modals
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showBanModal, setShowBanModal] = useState(false);
+  const [banReason, setBanReason] = useState('');
+  const [loadingAction, setLoadingAction] = useState(false);
 
   const fetchUsers = async (page = 1) => {
     setLoading(true);
@@ -50,6 +57,65 @@ const AdminUsersPage = () => {
       // Revert on error
       setUsers(previousUsers);
       alert('Failed to update role');
+    }
+  };
+
+  const handleViewDetail = async (user) => {
+    setLoadingAction(true);
+    try {
+      const response = await getUserById(user.id);
+      setSelectedUser(response.data);
+      setShowDetailModal(true);
+    } catch (err) {
+      alert('Failed to load user details');
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+
+    setLoadingAction(true);
+    try {
+      await deleteUser(userId);
+      setUsers(users.filter(u => u.id !== userId));
+      alert('User deleted successfully');
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to delete user');
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
+  const handleBanClick = (user) => {
+    setSelectedUser(user);
+    setBanReason('');
+    setShowBanModal(true);
+  };
+
+  const handleToggleBan = async () => {
+    if (!selectedUser) return;
+
+    setLoadingAction(true);
+    try {
+      const isBanning = !selectedUser.is_banned;
+      await toggleBanUser(selectedUser.id, isBanning, banReason);
+
+      // Update local state
+      setUsers(users.map(u =>
+        u.id === selectedUser.id
+          ? { ...u, is_banned: isBanning, ban_reason: isBanning ? banReason : null }
+          : u
+      ));
+
+      setShowBanModal(false);
+      setSelectedUser(null);
+      alert(isBanning ? 'User banned successfully' : 'User unbanned successfully');
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to update ban status');
+    } finally {
+      setLoadingAction(false);
     }
   };
 
@@ -145,8 +211,9 @@ const AdminUsersPage = () => {
                 <thead className="bg-slate-50/80 border-b border-slate-100 backdrop-blur-sm">
                   <tr>
                     <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-wider pl-8">User Profile</th>
-                    <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-wider">Current Role</th>
-                    <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-wider">Joined Date</th>
+                    <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-wider">Role</th>
+                    <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-wider">Joined</th>
                     <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-wider text-right pr-8">Actions</th>
                   </tr>
                 </thead>
@@ -159,7 +226,7 @@ const AdminUsersPage = () => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                       >
-                        <td colSpan="4" className="text-center py-24 text-slate-400 font-medium">
+                        <td colSpan="5" className="text-center py-24 text-slate-400 font-medium">
                           <div className="flex flex-col items-center gap-3">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                             <p>Loading users...</p>
@@ -172,14 +239,14 @@ const AdminUsersPage = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                      ><td colSpan="4" className="text-center py-12 text-red-500 font-medium">{error}</td></motion.tr>
+                      ><td colSpan="5" className="text-center py-12 text-red-500 font-medium">{error}</td></motion.tr>
                     ) : users.length === 0 ? (
                       <motion.tr
                         key="no-users"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                      ><td colSpan="4" className="text-center py-24 text-slate-400 font-medium">No users found matching criteria</td></motion.tr>
+                      ><td colSpan="5" className="text-center py-24 text-slate-400 font-medium">No users found matching criteria</td></motion.tr>
                     ) : (
                       users.map((user, index) => (
                         <motion.tr
@@ -210,6 +277,19 @@ const AdminUsersPage = () => {
                             </div>
                           </td>
                           <td className="px-6 py-4 align-middle">
+                            {user.is_banned ? (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-red-50 text-red-600 border border-red-100">
+                                <Ban size={14} />
+                                BANNED
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-green-50 text-green-600 border border-green-100">
+                                <CheckCircle size={14} />
+                                ACTIVE
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 align-middle">
                             <span className={`
                                     inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border shadow-sm
                                     ${user.role === 'admin'
@@ -224,23 +304,56 @@ const AdminUsersPage = () => {
                             {new Date(user.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                           </td>
                           <td className="px-6 py-4 align-middle text-right pr-8">
-                            {user.role === 'user' ? (
+                            <div className="flex items-center justify-end gap-2">
+                              {/* View Detail Button */}
                               <button
-                                onClick={() => handleRoleChange(user.id, 'admin')}
-                                className="text-slate-400 hover:text-indigo-600 font-bold text-xs bg-slate-50 hover:bg-indigo-50 px-3 py-2 rounded-xl transition-all inline-flex items-center gap-2 hover:shadow-md"
+                                onClick={() => handleViewDetail(user)}
+                                className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
+                                title="View Details"
                               >
-                                <UserCog size={16} />
-                                PROMOTE
+                                <Eye size={18} />
                               </button>
-                            ) : (
+
+                              {/* Ban/Unban Button */}
                               <button
-                                onClick={() => handleRoleChange(user.id, 'user')}
-                                className="text-slate-400 hover:text-rose-600 font-bold text-xs bg-slate-50 hover:bg-rose-50 px-3 py-2 rounded-xl transition-all inline-flex items-center gap-2 hover:shadow-md"
+                                onClick={() => handleBanClick(user)}
+                                className={`p-2 rounded-xl transition-all ${user.is_banned
+                                    ? 'text-green-500 hover:text-green-600 hover:bg-green-50'
+                                    : 'text-orange-400 hover:text-orange-600 hover:bg-orange-50'
+                                  }`}
+                                title={user.is_banned ? 'Unban User' : 'Ban User'}
                               >
-                                <UserCog size={16} />
-                                DEMOTE
+                                {user.is_banned ? <CheckCircle size={18} /> : <Ban size={18} />}
                               </button>
-                            )}
+
+                              {/* Role Toggle Button */}
+                              {user.role === 'user' ? (
+                                <button
+                                  onClick={() => handleRoleChange(user.id, 'admin')}
+                                  className="p-2 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                                  title="Promote to Admin"
+                                >
+                                  <UserCog size={18} />
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleRoleChange(user.id, 'user')}
+                                  className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all"
+                                  title="Demote to User"
+                                >
+                                  <UserCog size={18} />
+                                </button>
+                              )}
+
+                              {/* Delete Button */}
+                              <button
+                                onClick={() => handleDeleteUser(user.id)}
+                                className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all"
+                                title="Delete User"
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            </div>
                           </td>
                         </motion.tr>
                       ))
@@ -279,6 +392,174 @@ const AdminUsersPage = () => {
           </ClayCard>
         </motion.div>
       </div>
+
+      {/* User Detail Modal */}
+      <AnimatePresence>
+        {showDetailModal && selectedUser && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowDetailModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-slate-800">User Details</h2>
+                  <button
+                    onClick={() => setShowDetailModal(false)}
+                    className="p-2 rounded-xl hover:bg-slate-100 transition-colors"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                {/* User Avatar & Name */}
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="h-20 w-20 rounded-2xl overflow-hidden bg-slate-100">
+                    {selectedUser.avatar_url ? (
+                      <img className="h-full w-full object-cover" src={selectedUser.avatar_url} alt="" />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center bg-linear-to-br from-indigo-400 to-purple-500 text-white font-bold text-2xl">
+                        {selectedUser.full_name?.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-800">{selectedUser.full_name}</h3>
+                    <p className="text-slate-500">{selectedUser.email}</p>
+                    <div className="flex gap-2 mt-2">
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold ${selectedUser.role === 'admin' ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'
+                        }`}>
+                        {selectedUser.role.toUpperCase()}
+                      </span>
+                      {selectedUser.is_banned && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-600">
+                          BANNED
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* User Info */}
+                <div className="space-y-4">
+                  {selectedUser.university && (
+                    <div className="flex items-center gap-3 text-slate-600">
+                      <Building size={18} className="text-slate-400" />
+                      <span>{selectedUser.university}</span>
+                    </div>
+                  )}
+                  {selectedUser.major && (
+                    <div className="flex items-center gap-3 text-slate-600">
+                      <GraduationCap size={18} className="text-slate-400" />
+                      <span>{selectedUser.major}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-3 text-slate-600">
+                    <Calendar size={18} className="text-slate-400" />
+                    <span>Joined {new Date(selectedUser.created_at).toLocaleDateString()}</span>
+                  </div>
+                  {selectedUser.bio && (
+                    <div className="mt-4 p-4 bg-slate-50 rounded-xl">
+                      <p className="text-sm text-slate-600">{selectedUser.bio}</p>
+                    </div>
+                  )}
+                  {selectedUser.is_banned && selectedUser.ban_reason && (
+                    <div className="mt-4 p-4 bg-red-50 rounded-xl border border-red-100">
+                      <p className="text-sm font-bold text-red-600 mb-1">Ban Reason:</p>
+                      <p className="text-sm text-red-600">{selectedUser.ban_reason}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Ban/Unban Modal */}
+      <AnimatePresence>
+        {showBanModal && selectedUser && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowBanModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl shadow-2xl max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-slate-800">
+                    {selectedUser.is_banned ? 'Unban User' : 'Ban User'}
+                  </h2>
+                  <button
+                    onClick={() => setShowBanModal(false)}
+                    className="p-2 rounded-xl hover:bg-slate-100 transition-colors"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <p className="text-slate-600 mb-4">
+                  {selectedUser.is_banned
+                    ? `Are you sure you want to unban ${selectedUser.full_name}?`
+                    : `Are you sure you want to ban ${selectedUser.full_name}?`
+                  }
+                </p>
+
+                {!selectedUser.is_banned && (
+                  <div className="mb-6">
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      Ban Reason (optional)
+                    </label>
+                    <textarea
+                      value={banReason}
+                      onChange={(e) => setBanReason(e.target.value)}
+                      placeholder="Enter the reason for banning..."
+                      className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-400/50 outline-none resize-none"
+                      rows={3}
+                    />
+                  </div>
+                )}
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowBanModal(false)}
+                    className="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleToggleBan}
+                    disabled={loadingAction}
+                    className={`flex-1 px-4 py-3 rounded-xl font-bold text-white transition-colors disabled:opacity-50 ${selectedUser.is_banned
+                        ? 'bg-green-500 hover:bg-green-600'
+                        : 'bg-red-500 hover:bg-red-600'
+                      }`}
+                  >
+                    {loadingAction ? 'Processing...' : (selectedUser.is_banned ? 'Unban' : 'Ban User')}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

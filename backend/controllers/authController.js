@@ -134,10 +134,54 @@ export const changePassword = async (req, res, next) => {
   }
 };
 
+/**
+ * POST /auth/forgot-password
+ */
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      throw new AppError(ErrorCodes.VALIDATION_ERROR, 'Email is required');
+    }
+
+    const result = await authService.forgotPassword(email);
+
+    res.json({ data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * POST /auth/reset-password
+ */
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { email, token, newPassword } = req.body;
+
+    if (!email || !token || !newPassword) {
+      throw new AppError(ErrorCodes.VALIDATION_ERROR, 'Email, token and new password are required');
+    }
+
+    if (newPassword.length < 6) {
+      throw new AppError(ErrorCodes.VALIDATION_ERROR, 'Password must be at least 6 characters');
+    }
+
+    const result = await authService.resetPassword(email, token, newPassword);
+
+    res.json({ data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   register,
   login,
   refresh,
   logout,
-  changePassword
+  changePassword,
+  forgotPassword,
+  resetPassword
 };

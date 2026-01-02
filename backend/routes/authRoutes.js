@@ -62,5 +62,22 @@ router.post('/change-password',
   authController.changePassword
 );
 
+// POST /api/auth/forgot-password
+router.post('/forgot-password',
+  passwordChangeLimiter,
+  validateEmail(),
+  handleValidationErrors,
+  authController.forgotPassword
+);
+
+// POST /api/auth/reset-password
+router.post('/reset-password',
+  passwordChangeLimiter,
+  validateEmail(),
+  validatePasswordSimple('newPassword'),
+  handleValidationErrors,
+  authController.resetPassword
+);
+
 export default router;
 

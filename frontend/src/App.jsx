@@ -15,6 +15,7 @@ import LoginPage from '@/pages/LoginPage';
 // Lazy load all other pages for code splitting
 const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const FlashcardDashboard = lazy(() => import('@/pages/flashcards/FlashcardDashboard'));
 const FlashcardStudy = lazy(() => import('@/pages/flashcards/FlashcardStudy'));
@@ -82,6 +83,13 @@ function AppRoutes() {
         <PublicRoute>
           <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full" /></div>}>
             <ForgotPasswordPage />
+          </Suspense>
+        </PublicRoute>
+      } />
+      <Route path="/reset-password" element={
+        <PublicRoute>
+          <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full" /></div>}>
+            <ResetPasswordPage />
           </Suspense>
         </PublicRoute>
       } />
