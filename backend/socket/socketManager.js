@@ -25,7 +25,14 @@ function parseCookies(cookieHeader) {
 export const init = (server) => {
   io = new Server(server, {
     cors: {
-      origin: [env.FRONTEND_URL, 'http://localhost:5173'],
+      origin: [
+        env.FRONTEND_URL,
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'https://hustudent.id.vn',
+        'https://www.hustudent.id.vn',
+        'https://api.hustudent.id.vn'
+      ].filter(Boolean),
       credentials: true,
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
     },
