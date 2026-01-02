@@ -13,6 +13,9 @@ import { env } from './config/env.js';
 
 const app = express();
 
+// Trust proxy (required for rate limiting behind load balancers/proxies)
+app.set('trust proxy', 1);
+
 // ==========================================
 // SECURITY MIDDLEWARE
 // ==========================================
@@ -91,7 +94,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // NoSQL Injection Protection
-app.use(sanitizeNoSQL);
+// NoSQL Injection Protection (removed as we use PostgreSQL)
+// app.use(sanitizeNoSQL);
 
 // XSS Protection - Sanitize all inputs
 app.use(sanitizeAll);

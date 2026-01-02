@@ -14,6 +14,10 @@ const server = app.listen(PORT, async () => {
   try {
     await sequelize.authenticate();
     console.log('Database connected');
+
+    // Sync database models
+    await sequelize.sync();
+    console.log('Database synced');
   } catch (error) {
     console.log('Database error:', error.message);
   }

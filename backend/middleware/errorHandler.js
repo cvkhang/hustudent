@@ -2,6 +2,7 @@ import { env } from '../config/env.js';
 
 const errorHandler = (err, req, res, next) => {
   console.error(`[Error] ${err.message}`);
+  if (err.stack) console.error(err.stack);
 
   // Sequelize validation errors
   if (err.name === 'SequelizeValidationError') {
